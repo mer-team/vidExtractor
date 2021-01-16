@@ -4,7 +4,7 @@ var amqp = require('amqplib/callback_api');
 
 const config={
   protocol: 'amqp',
-  hostname: 'localhost/',
+  hostname: 'localhost',
   port: 5672,
   username: 'merUser',
   password: 'passwordMER',
