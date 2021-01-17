@@ -19,9 +19,10 @@ jobs:
       uses: getong/rabbitmq-action@v1.2
       with:
         rabbitmq version: '3-management-alpine'
-        host port: 5672
+        host port: 30000
         rabbitmq user: 'merUser'
         rabbitmq password: 'passwordMER'
+        rabbitmq vhost: ''
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
