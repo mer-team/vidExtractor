@@ -15,13 +15,13 @@ jobs:
         node-version: [10.x, 12.x, 14.x]
 
     steps:
-    - uses: getong/rabbitmq-action@v1.2
+    - name: Setup RabbitMQ
+      uses: getong/rabbitmq-action@v1.2
       with:
         rabbitmq version: '3-management-alpine'
         host port: 5672
         rabbitmq user: 'merUser'
         rabbitmq password: 'passwordMER'
-        rabbitmq vhost: '/'
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
