@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Setup RabbitMQ
-      uses: jpcanoso/rabbitmq-action@1.0
+      uses: jpcanoso/rabbitmq-action@1.1
       with:
         RABBITMQ_USER: 'merUser'
         RABBITMQ_PASS: 'passwordMER'
