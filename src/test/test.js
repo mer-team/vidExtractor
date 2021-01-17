@@ -15,7 +15,7 @@ const link = "https://www.youtube.com/watch?v=JiF3pbvR5G0";
 const path = '..\Audios\JiF3pbvR5G0.wav';
 
 describe('Testing RabbitMQ', ()=>{
-  it('Should connect to the RabbitMQ', (done)=>{
+  /* it('Should connect to the RabbitMQ', (done)=>{
     amqp.connect(config, (err, conn)=>{
       if(err){
         console.log("Connection Error");
@@ -24,7 +24,7 @@ describe('Testing RabbitMQ', ()=>{
       done();
       setTimeout(function() { conn.close();}, 500);
     });
-  }); /*
+  }); */
 
   it('Should create the RabbitMQ channel', (done)=>{
     amqp.connect(config, (err, conn)=>{
@@ -41,7 +41,7 @@ describe('Testing RabbitMQ', ()=>{
         setTimeout(function() { conn.close();}, 500);
       });
     });
-  });
+  }); /*
 
   it('Should send a message to the RabbitMQ', (done)=>{
     amqp.connect(config, (err, conn)=>{
