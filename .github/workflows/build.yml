@@ -8,16 +8,22 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: [14.x]
 
     steps:
-    - name: Setup RabbitMQ
-      uses: jpcanoso/rabbitmq-action@1.2
-      with:
-        RABBITMQ_USER: 'merUser'
-        RABBITMQ_PASS: 'passwordMER'
-        RABBITMQ_PORT: 30000
-        RABBITMQ_TAG: '3-management-alpine'
+    - name: Setup RabbitMQ Image
+      uses: docker://rabbitmq:3-management-alpine
+      env:
+        RABBITMQ_DEFAULT_USER: 'merUser'
+        RABBITMQ_DEFAULT_PASS: 'passwordMER'
+    
+    #- name: Setup RabbitMQ
+    #  uses: jpcanoso/rabbitmq-action@1.2
+    #  with:
+    #    RABBITMQ_USER: 'merUser'
+    #    RABBITMQ_PASS: 'passwordMER'
+    #    RABBITMQ_PORT: 30000
+    #    RABBITMQ_TAG: '3-management-alpine'
 
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
@@ -25,10 +31,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install --also=dev
+    - name: Install dependencies
+      run: npm install --also=dev
       working-directory: src
-    
-    - run: npm test
+    #- name: Runnning build
+    #  run: npm run build --if-present
+    - name: Running tests
+      run: npm test
       working-directory: src
       env:
         CI: true
