@@ -8,32 +8,30 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [12.x, 14.x]
 
-    steps:
-    #- name: Setup RabbitMQ Image
-    #  uses: docker://rabbitmq:3-management-alpine
-    #  env:
-    #    RABBITMQ_DEFAULT_USER: 'merUser'
-    #    RABBITMQ_DEFAULT_PASS: 'passwordMER'
-    
-    - name: Setup RabbitMQ
-      uses: jpcanoso/rabbitmq-action@1.2
+    steps:    
+    - name: Setup RabbitMQ Image
+      uses: getong/rabbitmq-action@v1.2
       with:
-        RABBITMQ_USER: 'merUser'
-        RABBITMQ_PASS: 'passwordMER'
-        RABBITMQ_PORT: 30000
-        RABBITMQ_TAG: '3-management-alpine'
+        rabbitmq version: '3-management-alpine'
+        host port: 5672
+        rabbitmq user: 'merUser'
+        rabbitmq password: 'passwordMER'
+
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
-        time: '30s'
+        time: '10s'
+
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     - name: Install dependencies
       run: npm install --also=dev
       working-directory: src
