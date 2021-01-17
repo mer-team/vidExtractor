@@ -24,7 +24,10 @@ jobs:
         RABBITMQ_PASS: 'passwordMER'
         RABBITMQ_PORT: 30000
         RABBITMQ_TAG: '3-management-alpine'
-
+    - name: Sleep for 30 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '30s'
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
