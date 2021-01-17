@@ -16,13 +16,13 @@ jobs:
 
     steps:
     - name: Setup RabbitMQ
-      uses: getong/rabbitmq-action@v1.2
+      uses: jpcanoso/rabbitmq-action
       with:
-        rabbitmq version: '3-management-alpine'
-        host port: 30000
-        rabbitmq user: 'merUser'
-        rabbitmq password: 'passwordMER'
-        rabbitmq vhost: ''
+        RABBITMQ_USER: 'merUser'
+        RABBITMQ_PASS: 'passwordMER'
+        RABBITMQ_PORT: 30000
+        RABBITMQ_TAG: '3-management-alpine'
+
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
