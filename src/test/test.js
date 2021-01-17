@@ -24,7 +24,7 @@ describe('Testing RabbitMQ', ()=>{
       done();
       setTimeout(function() { conn.close();}, 500);
     });
-  });
+  }); /*
 
   it('Should create the RabbitMQ channel', (done)=>{
     amqp.connect(config, (err, conn)=>{
@@ -93,10 +93,10 @@ describe('Testing RabbitMQ', ()=>{
         }, { noAck: true });
       });
     });
-  });
+  }); */
 });
 
-describe('Testing vidExtractor Script', ()=>{
+/*describe('Testing vidExtractor Script', ()=>{
     try {
       if (fs.existsSync(path)) {
         console.log("ficheiro existe!");
@@ -107,4 +107,4 @@ describe('Testing vidExtractor Script', ()=>{
       console.log("Music File doesn't exist");
       return;
     }
-});
+}); */
