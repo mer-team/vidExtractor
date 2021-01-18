@@ -21,7 +21,7 @@ jobs:
         RABBITMQ_TAG: '3-management-alpine'
 
     - name: Sleep for 15 seconds
-      uses: jpcanoso/wait-for-http@1.0
+      uses: jpcanoso/wait-for-http@1.1
       with:
         URL: 'http://localhost:15672/api/whoami'
         USER: 'merUser'
