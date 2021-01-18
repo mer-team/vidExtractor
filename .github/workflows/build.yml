@@ -12,14 +12,15 @@ jobs:
 
     steps:    
     - name: Setup RabbitMQ Image
-      uses: getong/rabbitmq-action@v1.2
+      uses: jpcanoso/rabbitmq-mng-action@v1.3
       with:
-        rabbitmq version: '3-management-alpine'
-        host port: 5672
-        rabbitmq user: 'merUser'
-        rabbitmq password: 'passwordMER'
+        RABBITMQ_USER: 'merUser'
+        RABBITMQ_PASS: 'passwordMER'
+        RABBITMQ_PORT: 5672
+        RABBITMQ_MNG_PORT: 15672
+        RABBITMQ_TAG: '3-management-alpine'
 
-    - name: Sleep for 30 seconds
+    - name: Sleep for 10 seconds
       uses: jakejarvis/wait-action@master
       with:
         time: '10s'
