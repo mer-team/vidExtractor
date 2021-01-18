@@ -21,12 +21,12 @@ jobs:
         RABBITMQ_TAG: '3-management-alpine'
 
     - name: Sleep for 15 seconds
-      uses: jpcanoso/wait-for-http@1.1
+      uses: jpcanoso/wait-for-http@1.2
       with:
-        URL: 'http://localhost:15672/api/whoami'
-        USER: 'merUser'
-        PASS: 'passwordMER'
-        TIME: 15
+        WAIT_URL: 'http://localhost:15672/api/whoami'
+        WAIT_USER: 'merUser'
+        WAIT_PASS: 'passwordMER'
+        WAIT_TIME: 15
 
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
