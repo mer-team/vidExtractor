@@ -21,7 +21,7 @@ jobs:
         RABBITMQ_TAG: '3-management-alpine'
 
     - name: Wait for HTTP 200
-      run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:release
+      run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
 
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
