@@ -8,19 +8,36 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
+        node-version: [12.x, 14.x]
 
-    steps:
+    steps:    
+    - name: Setup RabbitMQ Image
+      uses: mer-team/rabbitmq-mng-action@v1.2
+      with:
+        RABBITMQ_USER: 'merUser'
+        RABBITMQ_PASS: 'passwordMER'
+        RABBITMQ_PORT: 5672
+        RABBITMQ_MNG_PORT: 15672
+        RABBITMQ_TAG: '3-management-alpine'
+
+    - name: Wait for HTTP 200
+      run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
+
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
+
+    - name: Install dependencies
+      run: npm install --also=dev
       working-directory: src
-    - run: npm run build --if-present
+    #- name: Runnning build
+    #  run: npm run build --if-present
+    - name: Running tests
+      run: npm test
       working-directory: src
-    #- run: npm test
-    #  env:
-    #    CI: true
+      env:
+        CI: true
