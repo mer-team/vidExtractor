@@ -12,7 +12,7 @@ jobs:
 
     steps:    
     - name: Setup RabbitMQ Image
-      uses: jpcanoso/rabbitmq-mng-action@1.3
+      uses: mer-team/rabbitmq-mng-action@v1.2
       with:
         RABBITMQ_USER: 'merUser'
         RABBITMQ_PASS: 'passwordMER'
