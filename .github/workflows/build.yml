@@ -23,26 +23,27 @@ jobs:
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
+    #- name: Set up QEMU
+    #  uses: docker/setup-qemu-action@v1
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+    #- name: Set up Docker Buildx
+    #  uses: docker/setup-buildx-action@v1
     
     - name: Build vidExtractor Project
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: ./Dockerfile
-        push: false
-        tags: vidextractor:latest
+      run: docker build -t vidextractor:latest .
+    #  uses: docker/build-push-action@v2
+    #  with:
+    #    context: .
+    #    file: ./Dockerfile
+    #    push: false
+    #    tags: vidextractor:latest
 
     - name: Run local project Image
-    #  run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host vidextractor:latest
-      uses: addnab/docker-run-action@v1
-      with:
-        image: vidextractor:latest
-        options: -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host
+      run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost --net=host vidextractor:latest
+    #  uses: addnab/docker-run-action@v1
+    #  with:
+    #    image: vidextractor:latest
+    #    options: -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host
 
     - name: Wait for HTTP 200
       run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
