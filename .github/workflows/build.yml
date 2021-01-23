@@ -39,7 +39,7 @@ jobs:
     #    tags: vidextractor:latest
 
     - name: Run local project Image
-      run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost --net=host vidextractor:latest
+      run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host vidextractor:latest
     #  uses: addnab/docker-run-action@v1
     #  with:
     #    image: vidextractor:latest
