@@ -38,11 +38,11 @@ jobs:
         tags: vidextractor:latest
 
     - name: Run local project Image
-      run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host vidextractor:latest
-    #  uses: addnab/docker-run-action@v1
-    #  with:
-    #    image: local/vidextractor:latest
-    #    options: -v $GITHUB_WORKSPACE/Audios:/vidExtrator/Audios
+    #  run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host vidextractor:latest
+      uses: addnab/docker-run-action@v1
+      with:
+        image: vidextractor:latest
+        options: -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host
 
     - name: Wait for HTTP 200
       run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
