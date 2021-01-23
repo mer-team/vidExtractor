@@ -26,14 +26,14 @@ jobs:
     - name: Build local project Image
       uses: docker/build-push-action@v1
       with:
-        repository: vidExtractor
+        repository: vidextractor
         push: false
 
     - name: Run local project Image
       uses: addnab/docker-run-action@v1
       with:
-        image: vidExtractor:latest
-        options: -v $GITHUB_WORKSPACE:/Audios
+        image: vidextractor:latest
+        options: -v $GITHUB_WORKSPACE/Audios:/vidExtrator/Audios
 
     - name: Wait for HTTP 200
       run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
