@@ -35,12 +35,12 @@ jobs:
         context: .
         file: ./Dockerfile
         push: false
-        tags: vidextractorlocal:latest
+        tags: local/vidextractor:latest
 
     - name: Run local project Image
       uses: addnab/docker-run-action@v1
       with:
-        image: vidextractorlocal:latest
+        image: local/vidextractor:latest
         options: -v $GITHUB_WORKSPACE/Audios:/vidExtrator/Audios
 
     - name: Wait for HTTP 200
