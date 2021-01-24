@@ -64,8 +64,8 @@ extractVideo = async (url,ch) => {
  */
 startScript = async () => {
     console.log("Starting")
-    console.log('amqp://${user}:${pass}@${host}/')
-    amqp.connect('amqp://${user}:${pass}@${host}/', function(err, conn) {
+    console.log(`amqp://${user}:${pass}@${host}/`)
+    amqp.connect(`amqp://${user}:${pass}@${host}/`, function(err, conn) {
     conn.createChannel(function(err, ch) {
         console.log("Connected")
         var q = 'musicExtraction';
