@@ -1,6 +1,11 @@
-const fs = require('fs')
-const ytdl = require('ytdl-core')
+const fs = require('fs'),
+    ytdl = require('ytdl-core'),
+    user = process.env.HOST || 'merUser',
+    pass = process.env.HOST || 'passwordMER',
+    host = process.env.HOST || 'rabbit',
+    port = process.env.PORT || 5672;
 var amqp = require('amqplib/callback_api');
+
 
 /** 
  * Verifica se o URL fornecido está num formato válido aceite pelo Youtube 
@@ -59,7 +64,7 @@ extractVideo = async (url,ch) => {
  */
 startScript = async () => {
     console.log("Starting")
-    amqp.connect('amqp://merUser:passwordMER@rabbit/', function(err, conn) {
+    amqp.connect('amqp://${user}:${pass}@${host}/', function(err, conn) {
     conn.createChannel(function(err, ch) {
         console.log("Connected")
         var q = 'musicExtraction';
