@@ -1,8 +1,8 @@
 const fs = require('fs'),
     ytdl = require('ytdl-core'),
-    user = process.env.HOST || 'merUser',
-    pass = process.env.HOST || 'passwordMER',
-    host = process.env.HOST || 'rabbit',
+    user = process.env.USER || 'merUser',
+    pass = process.env.PASS || 'passwordMER',
+    host = process.env.HOST || 'localhost',
     port = process.env.PORT || 5672;
 var amqp = require('amqplib/callback_api');
 
