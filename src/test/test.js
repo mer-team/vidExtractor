@@ -123,20 +123,21 @@ describe('Testing RabbitMQ', ()=>{
       });
     });
   });
-});
 
-// wait 5s
-setTimeout(
-  describe('Testing vidExtractor Script', ()=>{
-    try {
-      console.log(`dir: ${GITHUB_WORKSPACE}/Audios/${mfile}`);
-      if (fs.existsSync(`${GITHUB_WORKSPACE}/Audios/${mfile}`)) {
-        console.log("ficheiro existe!");
-        done();
+  it("Testing vidExtractor Script", (done)=>{
+    this.timeout(10000);
+    setTimeout(function () {
+      try {
+        console.log(`dir: ${GITHUB_WORKSPACE}/Audios/${mfile}`);
+        if (fs.existsSync(`${GITHUB_WORKSPACE}/Audios/${mfile}`)) {
+          console.log("ficheiro existe!");
+          done();
+        }
+      } catch(err) {
+        console.error(err);
+        console.log("Music File doesn't exist");
+        return;
       }
-    } catch(err) {
-      console.error(err);
-      console.log("Music File doesn't exist");
-      return;
-    }
-}), 5000);
+    }, 10000);
+  });
+});
