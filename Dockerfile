@@ -14,6 +14,8 @@ COPY ./src /vidExtractor
 
 WORKDIR /vidExtractor
 
+CMD mkdir Audios
+
 RUN npm install
 
 RUN chmod +x ./wait-for-rabbit.sh
