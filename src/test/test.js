@@ -1,6 +1,7 @@
 const fs = require('fs');
 var amqp = require('amqplib/callback_api');
-//var vid = require('../vidExtractorScript').startScript;
+
+const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE;
 
 const config={
   protocol: 'amqp',
@@ -12,7 +13,7 @@ const config={
 
 const q = "musicExtractionTest";
 const link = "https://www.youtube.com/watch?v=JiF3pbvR5G0";
-const path = '..\Audios\JiF3pbvR5G0.wav';
+const mfile = 'JiF3pbvR5G0.wav';
 
 describe('Testing RabbitMQ', ()=>{
   it('Should connect to the RabbitMQ', (done)=>{
@@ -21,6 +22,34 @@ describe('Testing RabbitMQ', ()=>{
         console.log("Connection Error");
         return;
       }
+      done();
+      setTimeout(function() { conn.close();}, 500);
+    });
+  });
+
+  it('Should send a music to download', (done)=>{
+    amqp.connect(config, (err, conn)=>{
+      if(err){
+        console.log("Connection Error");
+        return;
+      }
+      conn.createChannel((err, ch)=>{
+        if(err){
+          console.log("Error Creating Channel");
+          return;
+        }
+        ch.assertQueue("musicExtraction", { durable: false }); 
+        ch.sendToQueue("musicExtraction", Buffer.from(link),
+          function(err) {
+            if(err) {
+              console.log("Error sending the message: ",err);
+              return;         
+            } else {
+              console.log("Message sent");
+              done();
+          }
+        });
+      });
       done();
       setTimeout(function() { conn.close();}, 500);
     });
@@ -96,9 +125,12 @@ describe('Testing RabbitMQ', ()=>{
   });
 });
 
-/*describe('Testing vidExtractor Script', ()=>{
+// wait 5s
+setTimeout(
+  describe('Testing vidExtractor Script', ()=>{
     try {
-      if (fs.existsSync(path)) {
+      console.log(`dir: ${GITHUB_WORKSPACE}/Audios/${mfile}`);
+      if (fs.existsSync(`${GITHUB_WORKSPACE}/Audios/${mfile}`)) {
         console.log("ficheiro existe!");
         done();
       }
@@ -107,4 +139,4 @@ describe('Testing RabbitMQ', ()=>{
       console.log("Music File doesn't exist");
       return;
     }
-}); */
+}), 5000);
