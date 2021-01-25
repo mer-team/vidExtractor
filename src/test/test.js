@@ -129,7 +129,7 @@ describe('Testing vidExtractor Script', function() {
   this.timeout(5000);
   it('Should download the music file in the Docker Image', function(done) {
     setTimeout(
-      fs.access(`${GITHUB_WORKSPACE}/Audios/${mfile}`, fs.F_OK, (err) => {
+      fs.access(`${GITHUB_WORKSPACE}/${mfile}`, fs.F_OK, (err) => {
         if (err) {
           console.error(err)
           return

@@ -27,7 +27,7 @@ jobs:
       run: docker build -t vidextractor:latest .
 
     - name: Run Local vidExtractor Docker Image
-      run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host -v $GITHUB_WORKSPACE/Audios:/vidExtrator/Audios vidextractor:latest
+      run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host -v $GITHUB_WORKSPACE/:/vidExtrator/Audios vidextractor:latest
 
     #- name: Wait for HTTP 200
     #  run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
