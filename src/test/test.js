@@ -1,8 +1,6 @@
 const fs = require('fs');
 var amqp = require('amqplib/callback_api');
 
-const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE;
-
 const config={
   protocol: 'amqp',
   hostname: 'localhost',
@@ -11,7 +9,8 @@ const config={
   password: 'passwordMER',
 }
 
-const qTest = "musicExtractionTest",
+const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE;
+      qTest = "musicExtractionTest",
       qMain = "musicExtraction",
       validLink = "https://www.youtube.com/watch?v=JiF3pbvR5G0",
       validFile = 'JiF3pbvR5G0.wav',
@@ -176,9 +175,7 @@ describe('Testing vidExtractor Script', function() {
         if (err) {
           console.log("File not found!");
           done();
-          
         }
-        console.log("ficheiro existe!");
         return
       })}, 5000);
   });
