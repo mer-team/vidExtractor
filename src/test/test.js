@@ -141,5 +141,4 @@ setTimeout(function() {
       }
     });
   });
-  run();
 }, 5000);
