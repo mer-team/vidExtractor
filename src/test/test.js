@@ -123,10 +123,11 @@ describe('Testing RabbitMQ', ()=>{
       });
     });
   });
+});
 
-  it("Testing vidExtractor Script", (done)=>{
-    this.timeout(10000);
-    setTimeout(function () {
+setTimeout(function() {
+  describe('Testing vidExtractor Script', ()=>{
+    it("Should download the music file in the Docker Image", (done)=>{
       try {
         console.log(`dir: ${GITHUB_WORKSPACE}/Audios/${mfile}`);
         if (fs.existsSync(`${GITHUB_WORKSPACE}/Audios/${mfile}`)) {
@@ -138,6 +139,7 @@ describe('Testing RabbitMQ', ()=>{
         console.log("Music File doesn't exist");
         return;
       }
-    }, 10000);
+    });
   });
-});
+  run();
+}, 5000);
