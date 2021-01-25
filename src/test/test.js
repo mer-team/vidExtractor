@@ -126,9 +126,8 @@ describe('Testing RabbitMQ', ()=>{
 });
 
 describe('Testing vidExtractor Script', function() {
-  this.timeout(5000);
   it('Should download the music file in the Docker Image', function(done) {
-    setTimeout(
+    setTimeout(function(){
       fs.access(`${GITHUB_WORKSPACE}/${mfile}`, fs.F_OK, (err) => {
         if (err) {
           console.error(err)
@@ -136,6 +135,6 @@ describe('Testing vidExtractor Script', function() {
         }
         console.log("ficheiro existe!");
         done();
-      }), 5000);
+      })}, 5000);
   });
 });
