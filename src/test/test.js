@@ -1,6 +1,5 @@
 const fs = require('fs');
 var amqp = require('amqplib/callback_api');
-//var vid = require('../vidExtractorScript').startScript;
 
 const config={
   protocol: 'amqp',
@@ -10,9 +9,13 @@ const config={
   password: 'passwordMER',
 }
 
-const q = "musicExtraction";
-const link = "https://www.youtube.com/watch?v=JiF3pbvR5G0";
-const path = '..\Audios\JiF3pbvR5G0.wav';
+const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE;
+      qTest = "musicExtractionTest",
+      qMain = "musicExtraction",
+      validLink = "https://www.youtube.com/watch?v=JiF3pbvR5G0",
+      validFile = 'JiF3pbvR5G0.wav',
+      invalidLink = "https://www.youtube.com/watch?v=ev-U6vl5Lek",
+      invalidFile = "ev-U6vl5Lek.wav";
 
 describe('Testing RabbitMQ', ()=>{
   it('Should connect to the RabbitMQ', (done)=>{
@@ -21,6 +24,62 @@ describe('Testing RabbitMQ', ()=>{
         console.log("Connection Error");
         return;
       }
+      done();
+      setTimeout(function() { conn.close();}, 500);
+    });
+  });
+
+  it('Should send a music to download', (done)=>{
+    amqp.connect(config, (err, conn)=>{
+      if(err){
+        console.log("Connection Error");
+        return;
+      }
+      conn.createChannel((err, ch)=>{
+        if(err){
+          console.log("Error Creating Channel");
+          return;
+        }
+        ch.assertQueue(qMain, { durable: false }); 
+        ch.sendToQueue(qMain, Buffer.from(validLink),
+          function(err) {
+            if(err) {
+              console.log("Error sending the message: ",err);
+              return;         
+            } else {
+              console.log("Message sent");
+              done();
+          }
+        });
+      });
+      done();
+      setTimeout(function() { conn.close();}, 500);
+    });
+  });
+
+  it('Should send an invalid music to download', (done)=>{
+    amqp.connect(config, (err, conn)=>{
+      if(err){
+        console.log("Connection Error");
+        return;
+      }
+      conn.createChannel((err, ch)=>{
+        if(err){
+          console.log("Error Creating Channel");
+          return;
+        }
+        ch.assertQueue(qMain, { durable: false }); 
+        ch.sendToQueue(qMain, Buffer.from(invalidLink),
+          function(err) {
+            if(err) {
+              console.log("Error sending the message: ",err);
+              return;         
+            } else {
+              console.log("Message sent");
+              done();
+          }
+        });
+      });
       done();
       setTimeout(function() { conn.close();}, 500);
     });
@@ -54,8 +113,8 @@ describe('Testing RabbitMQ', ()=>{
           console.log("Error Creating Channel");
           return;
         }
-        ch.assertQueue(q, { durable: false }); 
-        ch.sendToQueue(q, new Buffer(link), { persistent: false },
+        ch.assertQueue(qTest, { durable: false }); 
+        ch.sendToQueue(qTest, Buffer.from(validLink), { persistent: false },
         function(err) {
           if(err) {
             console.log("Error sending the message: ",err);
@@ -81,9 +140,9 @@ describe('Testing RabbitMQ', ()=>{
           console.log("Error Creating Channel");
           return;
         }
-        ch.assertQueue(q, { durable: false });
-        ch.consume(q, function (msg) {
-          if (msg.content.toString() == link){
+        ch.assertQueue(qTest, { durable: false });
+        ch.consume(qTest, function (msg) {
+          if (msg.content.toString() == validLink){
             done();
             setTimeout(function() { conn.close();}, 500);
           } else {
@@ -96,15 +155,28 @@ describe('Testing RabbitMQ', ()=>{
   });
 });
 
-/*describe('Testing vidExtractor Script', ()=>{
-    try {
-      if (fs.existsSync(path)) {
-        console.log("ficheiro existe!");
+describe('Testing vidExtractor Script', function() {
+  it('Should download the music file in the Docker Image', function(done) {
+    setTimeout(function(){
+      fs.access(`${GITHUB_WORKSPACE}/${validFile}`, fs.F_OK, (err) => {
+        if (err) {
+          console.error(err)
+          console.log("File not found!");
+          return
+        }
+        console.log("File found!");
         done();
-      }
-    } catch(err) {
-      console.error(err);
-      console.log("Music File doesn't exist");
-      return;
-    }
-}); */
+      })}, 5000);
+  });
+
+  it('Should not download the music file, valid URL, not a music', function(done) {
+    setTimeout(function(){
+      fs.access(`${GITHUB_WORKSPACE}/${invalidFile}`, fs.F_OK, (err) => {
+        if (err) {
+          console.log("File not found!");
+          done();
+        }
+        return
+      })}, 5000);
+  });
+});
