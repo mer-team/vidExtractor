@@ -52,7 +52,7 @@ extractVideo = async (url,ch) => {
             process.stdout.write('Completed video extraction\n');
             var q = 'musicFeatures';
             ch.assertQueue(q, {durable: false});
-            ch.sendToQueue(q, new Buffer(vID), {persistent: false});
+            ch.sendToQueue(q, Buffer.from(vID), {persistent: false});
             console.log(" [x] Sent '%s'", vID);
           });
     })
