@@ -10,7 +10,7 @@ const config={
   password: 'passwordMER',
 }
 
-const q = "musicExtraction";
+const q = "musicExtractionTest";
 const link = "https://www.youtube.com/watch?v=JiF3pbvR5G0";
 const path = '..\Audios\JiF3pbvR5G0.wav';
 
