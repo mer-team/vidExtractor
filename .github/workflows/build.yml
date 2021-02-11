@@ -10,7 +10,7 @@ jobs:
       matrix:
         node-version: [12.x, 14.x]
 
-    steps:    
+    steps:
     - name: Setup RabbitMQ Image
       uses: mer-team/rabbitmq-mng-action@v1.2
       with:
@@ -22,15 +22,12 @@ jobs:
 
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
-    
+
     - name: Build Local vidExtractor Docker Image
       run: docker build -t vidextractor:latest .
 
     - name: Run Local vidExtractor Docker Image
       run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
-
-    #- name: Wait for HTTP 200
-    #  run: docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host merteam/wait-for-http:latest
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -47,3 +44,7 @@ jobs:
       working-directory: src
       env:
         CI: true
+
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v1
