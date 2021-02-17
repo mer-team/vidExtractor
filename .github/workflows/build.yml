@@ -10,14 +10,21 @@ jobs:
       matrix:
         node-version: [12.x, 14.x]
 
+    env:
+      MQHOST: localhost
+      MQUSER: merUser
+      MQPASS: passwordMER
+      MQPORT: 5672
+      MNG_PORT: 15672
+
     steps:
     - name: Setup RabbitMQ Image
       uses: mer-team/rabbitmq-mng-action@v1.2
       with:
-        RABBITMQ_USER: 'merUser'
-        RABBITMQ_PASS: 'passwordMER'
-        RABBITMQ_PORT: 5672
-        RABBITMQ_MNG_PORT: 15672
+        RABBITMQ_USER: $MQUSER
+        RABBITMQ_PASS: $MQPASS
+        RABBITMQ_PORT: $MQPORT
+        RABBITMQ_MNG_PORT: $MNG_PORT
         RABBITMQ_TAG: '3-management-alpine'
 
     - name: Checkout vidExtractor Project
@@ -27,7 +34,7 @@ jobs:
       run: docker build -t vidextractor:latest .
 
     - name: Run Local vidExtractor Docker Image
-      run: docker run -e TIME=10 -e HOST=localhost -e USER=merUser -e PASS=passwordMER --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
+      run: docker run -e TIME=10 -e HOST=$MQHOST -e USER=$MQUSER -e PASS=$MQPASS -e MNG_PORT=$MNG_PORT --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
