@@ -34,7 +34,7 @@ jobs:
         with:
           user: ${{ secrets.DOCKER_USERNAME }}
           pass: ${{ secrets.DOCKER_PASSWORD }}
-          slug: merteam/wait-for-http
+          slug: merteam/vidextractor
           description: NodeJS microservice responsible for downloading the YouTube audio file
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
