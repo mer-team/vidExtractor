@@ -17,3 +17,24 @@ When finished with success it sends the videoID to the `musicFeatures` queue lis
 | Container Path | Description |
 | --- | --- |
 | `/vidExtractor/Audios` | Folder where the downloaded audio files are saved |
+
+### Run Local Microservice
+Run Rabbit
+```
+docker run -d -e RABBITMQ_DEFAULT_USER=merUser -e RABBITMQ_DEFAULT_PASS=passwordMER -p 15672:15672 -p 5672:5672 rabbitmq:3-management-alpine
+```
+
+Build local `vidExtractor` from source
+```
+docker build -t localvidextractor:latest .
+```
+
+Run local `vidExtractor`
+```
+docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" localvidextractor:latest
+```
+
+Run official `vidExtractor` image locally
+```
+docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" merteam/vidextractor:latest
+```
