@@ -35,7 +35,7 @@ jobs:
       run: docker build -t vidextractor:latest .
 
     - name: Run Local vidExtractor Docker Image
-      run: docker run -d -e TIME=$MQTIME -e HOST=$MQHOST -e USER=$MQUSER -e PASS=$MQPASS -e MNG_PORT=$MQMNGPORT --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
+      run: docker run -e TIME=$MQTIME -e HOST=$MQHOST -e USER=$MQUSER -e PASS=$MQPASS -e MNG_PORT=$MQMNGPORT --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
