@@ -6,10 +6,9 @@ When finished with success it sends the videoID to the `musicFeatures` queue lis
 ### Docker Params
 | Arg | Default | Description |
 | --- | --- | --- |
-| URL | localhost | URL to check |
 | HOST | localhost | RabbitMQ host |
-| USER | merUser | HTTP basic auth username  |
-| PASS | passwordMER | HTTP basic auth password |
+| USER | guest | HTTP basic auth username  |
+| PASS | guest | HTTP basic auth password |
 | PORT | 5672 | RabbitMQ Port |
 | MNG_PORT | 15672 | RabbitMQ Management Port |
 | TIME | 10 | Timeout to check if the service is up |

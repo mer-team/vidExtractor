@@ -27,7 +27,7 @@ jobs:
       run: docker build -t vidextractor:latest .
 
     - name: Run Local vidExtractor Docker Image
-      run: docker run -d -e TIME=10 -e USER=merUser -e PASS=passwordMER -e URL=http://localhost:15672/api/whoami --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
+      run: docker run -d -e TIME=10 -e HOST=localhost -e USER=merUser -e PASS=passwordMER --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
