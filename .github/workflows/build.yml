@@ -30,6 +30,12 @@ jobs:
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
 
+    - name: Create Audios Folder
+      uses: 1arp/create-a-file-action@0.2
+      with:
+        path: '/Audios'
+          file: 'foo.bar'
+
     - name: Build Local vidExtractor Docker Image
       run: docker build -t vidextractor:latest .
 
