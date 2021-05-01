@@ -31,10 +31,12 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Create Audios Folder
-      uses: 1arp/create-a-file-action@0.2
+      uses: DamianReeves/write-file-action
       with:
-        path: '/Audios'
-          file: 'foo.bar'
+        path: /Audios/teste.txt
+        contents: |
+          Hello World!
+        write-mode: overwrite
 
     - name: Build Local vidExtractor Docker Image
       run: docker build -t vidextractor:latest .
