@@ -158,7 +158,7 @@ describe('Testing RabbitMQ', ()=>{
 describe('Testing vidExtractor Script', function() {
   it('Should download the music file in the Docker Image', function(done) {
     setTimeout(function(){
-      fs.access(`/Audios/${validFile}`, fs.F_OK, (err) => {
+      fs.access(`${GITHUB_WORKSPACE}/${validFile}`, fs.F_OK, (err) => {
         if (err) {
           console.error(err)
           console.log("File not found!");
@@ -171,7 +171,7 @@ describe('Testing vidExtractor Script', function() {
 
   it('Should not download the music file, valid URL, not a music', function(done) {
     setTimeout(function(){
-      fs.access(`/Audios/${invalidFile}`, fs.F_OK, (err) => {
+      fs.access(`${GITHUB_WORKSPACE}/${invalidFile}`, fs.F_OK, (err) => {
         if (err) {
           console.log("File not found!");
           done();
