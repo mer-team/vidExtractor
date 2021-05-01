@@ -34,7 +34,7 @@ validURL = async (url) => {
  */
 extractVideo = async (url,ch) => {
     var vID = await ytdl.getURLVideoID(url);
-    var path = './Audios/'+vID+'.wav'
+    var path = '/Audios/'+vID+'.wav'
     var audio = ytdl(url);
     audio.pipe(fs.createWriteStream(path));
     //https://github.com/MAMISHO/node-ytdl-core/commit/3e3b21215e6d02d729e9849f203e126e0b925efb
@@ -50,9 +50,17 @@ extractVideo = async (url,ch) => {
         })  */
         res.on('end', function() {
             process.stdout.write('Completed video extraction\n');
+            // music features
             var q = 'musicFeatures';
             ch.assertQueue(q, {durable: false});
             ch.sendToQueue(q, Buffer.from(vID), {persistent: false});
+            setTimeout(function () {
+                var q = 'soundWaves';
+                ch.assertQueue(q, {durable: false});
+                ch.sendToQueue(q, Buffer.from(vID), {persistent: false});
+              }, 500);
+            // sound wave
+            
             console.log(" [x] Sent '%s'", vID);
           });
     })
