@@ -34,7 +34,7 @@ validURL = async (url) => {
  */
 extractVideo = async (url,ch) => {
     var vID = await ytdl.getURLVideoID(url);
-    var path = '/Audios/'+vID+'.wav'
+    var path = './Audios/'+vID+'.wav'
     var audio = ytdl(url);
     audio.pipe(fs.createWriteStream(path));
     //https://github.com/MAMISHO/node-ytdl-core/commit/3e3b21215e6d02d729e9849f203e126e0b925efb

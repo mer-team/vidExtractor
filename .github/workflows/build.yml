@@ -30,14 +30,6 @@ jobs:
     - name: Checkout vidExtractor Project
       uses: actions/checkout@v2
 
-    - name: Create Audios Folder
-      uses: DamianReeves/write-file-action
-      with:
-        path: /Audios/teste.txt
-        contents: |
-          Hello World!
-        write-mode: overwrite
-
     - name: Build Local vidExtractor Docker Image
       run: docker build -t vidextractor:latest .
 
