@@ -20,4 +20,4 @@ RUN npm install
 
 RUN chmod +x ./wait-for-rabbit.sh
 
-CMD ["./wait-for-rabbit.sh", "node", "vidExtractorScript"]
+ENTRYPOINT ["./wait-for-rabbit.sh", "node", "vidExtractorScript"]
