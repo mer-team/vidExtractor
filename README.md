@@ -18,23 +18,32 @@ When finished with success it sends the videoID to the queue `musicFeatures` for
 | --- | --- |
 | `/Audios` | Folder where the downloaded audio files are saved |
 
+### RabbitMQ Queues
+* Read from `musicFeatures`
+    * Payload: `vID` (Video ID)
+* Send to `soundWaves`
+    * Payload: `vID` (Video ID)
+
 ### Run Local Microservice
 Run Rabbit
 ```
 docker run -d -e RABBITMQ_DEFAULT_USER=merUser -e RABBITMQ_DEFAULT_PASS=passwordMER -p 15672:15672 -p 5672:5672 rabbitmq:3-management-alpine
 ```
 
-Build local `vidExtractor` from source
+Build local `vidExtractor` image from source
 ```
-docker build -t localvidextractor:latest .
-```
-
-Run local `vidExtractor`
-```
-docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" localvidextractor:latest
+docker build -t vidextractor:local .
 ```
 
-Run official `vidExtractor` image locally
+Run local `vidExtractor` image
+```
+docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" vidextractor:local
+```
+
+Run official `vidExtractor` image
 ```
 docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" merteam/vidextractor:latest
 ```
+
+### Tests
+Tests based on `mocha` that test the RabbitMQ connection and the download of one file
