@@ -33,10 +33,10 @@ jobs:
     - name: Build Local vidExtractor Docker Image
       run: docker build -t vidextractor:latest .
 
-    - name: Container Image Scan
-      uses: azure/container-scan@v0
-      with:
-        image-name: vidextractor:latest
+    #- name: Container Image Scan
+    #  uses: azure/container-scan@v0
+    #  with:
+    #    image-name: vidextractor:latest
 
     - name: Run Local vidExtractor Docker Image
       run: docker run -d -e TIME=10 -e HOST=$MQHOST -e USER=$MQUSER -e PASS=$MQPASS -e MNG_PORT=$MNG_PORT --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
