@@ -26,12 +26,12 @@ docker run -d -e RABBITMQ_DEFAULT_USER=merUser -e RABBITMQ_DEFAULT_PASS=password
 
 Build local `vidExtractor` from source
 ```
-docker build -t localvidextractor:latest .
+docker build -t vidextractor:local .
 ```
 
 Run local `vidExtractor`
 ```
-docker run -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=localhost -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" localvidextractor:latest
+docker run --rm -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=127.0.0.1 -e MNG_PORT=15672 --net=host -v "Audios":"/vidExtractor/Audios" vidextractor:local
 ```
 
 Run official `vidExtractor` image locally

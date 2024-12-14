@@ -14,7 +14,7 @@ COPY ./src /vidExtractor
 
 WORKDIR /vidExtractor
 
-CMD mkdir /Audios
+RUN mkdir -p /vidExtractor/Audios
 
 RUN npm install
 
