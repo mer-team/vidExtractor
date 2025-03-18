@@ -1,0 +1,41 @@
+{
+  "name": "vid-extractor",
+  "version": "1.0.0",
+  "description": "Microservice to download YouTube audio using ytdl-core",
+  "homepage": "https://mermaid.dei.uc.pt",
+  "main": "src/index.js",
+  "bugs": {
+    "url": "https://github.com/mer-team/vidExtractor/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mer-team/mermaid-fe.git"
+  },
+  "author": "MERmaid Team (https://github.com/orgs/mer-team/people)",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "mocha test --timeout 10000",
+    "lint": "npx eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier . --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "cli-table3": "^0.6.3",
+    "progress": "^2.0.3",
+    "winston": "^3.3.3",
+    "ytdl-core": "^4.11.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^16.0.0",
+    "mocha": "^10.2.0",
+    "prettier": "3.5.3"
+  }
+}
