@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const logger = require('./logger');
 const ProgressBar = require('progress');
+const { logAvailableStreams } = require('./streamLogger');
 
 class Downloader extends EventEmitter {
   async downloadAudio(videoUrl, outputFolder = './') {
@@ -22,6 +23,10 @@ class Downloader extends EventEmitter {
       const videoCategory = info.videoDetails.category;
       logger.verbose(`Video info: id=${videoId}, category=${videoCategory}`);
 
+      // Log available streams if LOG_LEVEL is DEBUG
+      logAvailableStreams(info);
+
+      // Ensure the video is in the Music category
       if (videoCategory !== 'Music') {
         this.emit('failure', {
           status: 406,
@@ -31,6 +36,7 @@ class Downloader extends EventEmitter {
         return;
       }
 
+      // Filter and select the best audio format
       const allowedContainers = ['ogg', 'webm', 'mp4', 'm4a', 'wav', 'mp3'];
       const audioFormats = info.formats.filter(
         (fmt) =>
@@ -58,7 +64,7 @@ class Downloader extends EventEmitter {
 
       const totalBytes = parseInt(bestAudio.contentLength, 10);
       const progressBar = new ProgressBar(
-        'Downloading [:bar] :rate/kbps :percent :etas',
+        'Downloading [:bar] :rate/bps :percent :etas',
         {
           total: totalBytes,
           width: 40,
@@ -78,19 +84,30 @@ class Downloader extends EventEmitter {
       const stream = ytdl(videoUrl, { format: bestAudio });
       const writeStream = fs.createWriteStream(outputPath);
 
+      // Pipe the download stream to the file
       stream.pipe(writeStream);
 
+      // Update progress bar
       stream.on('progress', (chunkLength) => {
         progressBar.tick(chunkLength);
       });
 
-      stream.on('finish', () => {
+      // Handle successful download
+      writeStream.on('finish', () => {
         logger.verbose(`Download completed: ${outputPath}`);
         this.emit('success', { status: 200, videoId, outputPath });
       });
 
+      // Handle errors during download
       stream.on('error', (error) => {
         logger.error(`Download failed: ${error.message}`);
+        writeStream.close(); // Ensure writeStream is closed
+        this.emit('error', { status: 500, message: error.message });
+      });
+
+      writeStream.on('error', (error) => {
+        logger.error(`File write failed: ${error.message}`);
+        stream.destroy(); // Ensure stream is destroyed
         this.emit('error', { status: 500, message: error.message });
       });
     } catch (error) {

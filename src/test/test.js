@@ -1,19 +1,16 @@
 const fs = require('fs');
-var amqp = require('amqplib/callback_api');
-
-// https://stackoverflow.com/questions/41604162/eslint-throws-is-assigned-a-value-but-never-used-webpack-module
-// eslint-disable-next-line no-unused-vars
-var assert = require('assert');
+const amqp = require('amqplib/callback_api');
+const assert = require('assert');
 
 const config = {
   protocol: 'amqp',
-  hostname: 'localhost',
+  hostname: 'rabbitmq',
   port: 5672,
-  username: 'merUser',
-  password: 'passwordMER',
+  username: 'guest',
+  password: 'guest',
 };
 
-const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE;
+const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE || '.';
 const qTest = 'musicExtractionTest';
 const qMain = 'musicExtraction';
 const validLink = 'https://www.youtube.com/watch?v=JiF3pbvR5G0';
@@ -22,153 +19,59 @@ const invalidLink = 'https://www.youtube.com/watch?v=ev-U6vl5Lek';
 const invalidFile = 'ev-U6vl5Lek.wav';
 
 describe('Testing RabbitMQ', () => {
-  it('Should connect to the RabbitMQ', (done) => {
+  it('Should connect to RabbitMQ', (done) => {
     amqp.connect(config, (err, conn) => {
-      if (err) {
-        console.log('Connection Error');
-        return;
-      }
-      done();
-      setTimeout(function () {
-        conn.close();
-      }, 500);
+      assert.ifError(err);
+      conn.close(done);
     });
   });
 
-  it('Should send a music to download', (done) => {
+  it('Should send a valid music download request', (done) => {
     amqp.connect(config, (err, conn) => {
-      if (err) {
-        console.log('Connection Error');
-        return;
-      }
+      assert.ifError(err);
       conn.createChannel((err, ch) => {
-        if (err) {
-          console.log('Error Creating Channel');
-          return;
-        }
+        assert.ifError(err);
         ch.assertQueue(qMain, { durable: false });
-        ch.sendToQueue(qMain, Buffer.from(validLink), function (err) {
-          if (err) {
-            console.log('Error sending the message: ', err);
-            return;
-          } else {
-            console.log('Message sent');
-            done();
-          }
-        });
+        ch.sendToQueue(qMain, Buffer.from(validLink));
+        conn.close(done);
       });
-      done();
-      setTimeout(function () {
-        conn.close();
-      }, 500);
     });
   });
 
-  it('Should send an invalid music to download', (done) => {
+  it('Should send an invalid music download request', (done) => {
     amqp.connect(config, (err, conn) => {
-      if (err) {
-        console.log('Connection Error');
-        return;
-      }
+      assert.ifError(err);
       conn.createChannel((err, ch) => {
-        if (err) {
-          console.log('Error Creating Channel');
-          return;
-        }
+        assert.ifError(err);
         ch.assertQueue(qMain, { durable: false });
-        ch.sendToQueue(qMain, Buffer.from(invalidLink), function (err) {
-          if (err) {
-            console.log('Error sending the message: ', err);
-            return;
-          } else {
-            console.log('Message sent');
-            done();
-          }
-        });
-      });
-      done();
-      setTimeout(function () {
-        conn.close();
-      }, 500);
-    });
-  });
-
-  it('Should create the RabbitMQ channel', (done) => {
-    amqp.connect(config, (err, conn) => {
-      if (err) {
-        console.log('Connection Error');
-        return;
-      }
-      conn.createConfirmChannel((err, ch) => {
-        if (err) {
-          console.log('Error Creating Channel');
-          return;
-        }
-        done();
-        setTimeout(function () {
-          conn.close();
-        }, 500);
+        ch.sendToQueue(qMain, Buffer.from(invalidLink));
+        conn.close(done);
       });
     });
   });
 
-  it('Should send a message to the RabbitMQ', (done) => {
+  it('Should create a RabbitMQ channel', (done) => {
     amqp.connect(config, (err, conn) => {
-      if (err) {
-        console.log('Connection Error');
-        return;
-      }
+      assert.ifError(err);
+      conn.createConfirmChannel((err) => {
+        assert.ifError(err);
+        conn.close(done);
+      });
+    });
+  });
+
+  it('Should send and receive a message from RabbitMQ', (done) => {
+    amqp.connect(config, (err, conn) => {
+      assert.ifError(err);
       conn.createChannel((err, ch) => {
-        if (err) {
-          console.log('Error Creating Channel');
-          return;
-        }
+        assert.ifError(err);
         ch.assertQueue(qTest, { durable: false });
-        ch.sendToQueue(
-          qTest,
-          Buffer.from(validLink),
-          { persistent: false },
-          function (err) {
-            if (err) {
-              console.log('Error sending the message: ', err);
-              return;
-            } else {
-              console.log('Message sent');
-            }
-          },
-        );
-      });
-      done();
-      setTimeout(function () {
-        conn.close();
-      }, 500);
-    });
-  });
-
-  it('Should receive a message from the RabbitMQ', (done) => {
-    amqp.connect(config, (err, conn) => {
-      if (err) {
-        console.log('Connection Error');
-        return;
-      }
-      conn.createChannel((err, ch) => {
-        if (err) {
-          console.log('Error Creating Channel');
-          return;
-        }
-        ch.assertQueue(qTest, { durable: false });
+        ch.sendToQueue(qTest, Buffer.from(validLink));
         ch.consume(
           qTest,
-          function (msg) {
-            if (msg.content.toString() == validLink) {
-              done();
-              setTimeout(function () {
-                conn.close();
-              }, 500);
-            } else {
-              console.log('Unexpected message');
-              return;
-            }
+          (msg) => {
+            assert.strictEqual(msg.content.toString(), validLink);
+            conn.close(done);
           },
           { noAck: true },
         );
@@ -177,29 +80,21 @@ describe('Testing RabbitMQ', () => {
   });
 });
 
-describe('Testing vidExtractor Script', function () {
-  it('Should download the music file in the Docker Image', function (done) {
-    setTimeout(function () {
+describe('Testing vidExtractor Script', () => {
+  it('Should download the music file', (done) => {
+    setTimeout(() => {
       fs.access(`${GITHUB_WORKSPACE}/${validFile}`, fs.F_OK, (err) => {
-        if (err) {
-          console.error(err);
-          console.log('File not found!');
-          return;
-        }
-        console.log('File found!');
+        assert.ifError(err);
         done();
       });
     }, 5000);
   });
 
-  it('Should not download the music file, valid URL, not a music', function (done) {
-    setTimeout(function () {
+  it('Should not download a file for an invalid music URL', (done) => {
+    setTimeout(() => {
       fs.access(`${GITHUB_WORKSPACE}/${invalidFile}`, fs.F_OK, (err) => {
-        if (err) {
-          console.log('File not found!');
-          done();
-        }
-        return;
+        assert.ok(err, 'File should not exist');
+        done();
       });
     }, 5000);
   });

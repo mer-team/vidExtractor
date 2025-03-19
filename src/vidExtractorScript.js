@@ -2,9 +2,8 @@ const ytdl = require('ytdl-core');
 const fs = require('fs');
 const amqp = require('amqplib');
 const ProgressBar = require('progress');
-const Table = require('cli-table3');
-const { table } = require('console');
 const path = require('path');
+const { logAvailableStreams } = require('./streamLogger');
 
 const greenCheckbox = '\x1b[32m\u2713\x1b[0m'; // Green checkbox with ANSI escape codes
 const yellowInfo = `\x1b[33mℹ\x1b[0m`; // Yellow info character with ANSI escape codes
@@ -100,79 +99,8 @@ async function downloadAudio(videoUrl, outputFolder = './') {
       );
     }
 
-    // Print available audio formats and bitrates
-    console.log('  [%s] Available Audio Streams:', yellowInfo);
-
-    // Create a Audio Streams table
-    const audioStreamsTable = new Table({
-      head: [
-        'Container',
-        'Bitrate',
-        'Codec',
-        'SampleRate',
-        'Channels',
-        'Quality',
-      ],
-      //colWidths: [20, 10, 30],
-      style: {
-        head: ['cyan'],
-        border: ['grey'],
-      },
-    });
-
-    info.formats
-      .filter((format) => format.mimeType.includes('audio'))
-      .forEach((format) => {
-        audioStreamsTable.push([
-          format.container,
-          `${format.audioBitrate} kbps`,
-          format.audioCodec,
-          format.audioSampleRate,
-          format.audioChannels,
-          format.audioQuality,
-        ]);
-        //  console.log(`   - Container: ${format.container} \tBitrate: ${format.audioBitrate} kbps \tCodec: ${format.audioCodec} \tSample Rate: ${format.audioSampleRate} \tChannels: ${format.audioChannels} \t Quality: ${format.audioQuality}`);
-      });
-
-    console.log(audioStreamsTable.toString());
-
-    // Print available video formats and bitrates
-    console.log('  [%s] Available Video Streams:', yellowInfo);
-
-    // Create a Audio Streams table
-    const videoStreamsTable = new Table({
-      head: [
-        'Container',
-        'Bitrate',
-        'Codec',
-        'Quality',
-        'FPS',
-        'Has Audio?',
-        'AudioBitrate',
-      ],
-      //colWidths: [20, 10, 30],
-      style: {
-        head: ['cyan'],
-        border: ['grey'],
-      },
-    });
-
-    info.formats
-      .filter((format) => format.mimeType.includes('video'))
-      .forEach((format) => {
-        videoStreamsTable.push([
-          format.container,
-          `${format.bitrate} kbps`,
-          format.codecs,
-          format.qualityLabel,
-          format.fps,
-          format.hasAudio,
-          format.audioBitrate,
-        ]);
-        // console.log(`   - Format: ${format.container} \tBitrate: ${format.bitrate} kbps \tQuality: ${format.qualityLabel} \tHasAudio: ${format.hasAudio} \tCodecs: ${format.codecs}`);
-      });
-
-    console.log(videoStreamsTable.toString());
+    // Log available streams if LOG_LEVEL is DEBUG
+    logAvailableStreams(info);
 
     // Filter for audio-only formats with allowed containers
     const allowedContainers = ['ogg', 'webm', 'mp4', 'm4a', 'wav', 'mp3'];

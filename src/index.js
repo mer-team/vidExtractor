@@ -80,7 +80,12 @@ async function startService() {
 
     process.on('SIGINT', async () => {
       logger.info('Shutting down...');
-      await channel.close();
+      try {
+        await channel.close();
+        logger.info('RabbitMQ channel closed.');
+      } catch (error) {
+        logger.error(`Error closing RabbitMQ channel: ${error.message}`);
+      }
       process.exit();
     });
   } catch (error) {

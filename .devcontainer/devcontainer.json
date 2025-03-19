@@ -28,7 +28,8 @@
         "waderyan.gitblame",
         "mhutchie.git-graph",
         "vincaslt.highlight-matching-tag",
-        "vscode-icons-team.vscode-icons"
+        "vscode-icons-team.vscode-icons",
+        "bierner.markdown-mermaid"
       ]
     }
   },
