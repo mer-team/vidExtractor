@@ -1,29 +1,34 @@
+const EventEmitter = require('events');
 const ytdl = require('@distube/ytdl-core');
 const fs = require('fs');
 const path = require('path');
 const logger = require('./logger');
 const ProgressBar = require('progress');
 
-async function downloadAudio(videoUrl, outputFolder = './') {
-  return new Promise(async (resolve, reject) => {
+class Downloader extends EventEmitter {
+  async downloadAudio(videoUrl, outputFolder = './') {
     try {
-      logger.info(`Starting download for URL: ${videoUrl}`);
+      logger.verbose(`Starting download for URL: ${videoUrl}`);
 
       // Validate URL
       if (!ytdl.validateURL(videoUrl)) {
-        logger.error('Invalid YouTube URL.');
+        this.emit('error', { status: 400, message: 'Invalid YouTube URL.' });
         return;
       }
 
-      // Get video ID and create filename
+      // Get video info
       const info = await ytdl.getInfo(videoUrl);
       const videoId = info.videoDetails.videoId;
       const videoCategory = info.videoDetails.category;
-      logger.info(`Video info: id=${videoId}, category=${videoCategory}`);
+      logger.verbose(`Video info: id=${videoId}, category=${videoCategory}`);
 
       if (videoCategory !== 'Music') {
-        logger.error('Video is not in the Music category.');
-        return null;
+        this.emit('failure', {
+          status: 406,
+          message: 'Video is not in the Music category.',
+          videoId,
+        });
+        return;
       }
 
       const allowedContainers = ['ogg', 'webm', 'mp4', 'm4a', 'wav', 'mp3'];
@@ -33,17 +38,21 @@ async function downloadAudio(videoUrl, outputFolder = './') {
           allowedContainers.includes(fmt.container),
       );
       if (audioFormats.length === 0) {
-        logger.error('No valid audio formats found.');
-        return null;
+        this.emit('failure', {
+          status: 404,
+          message: 'No valid audio formats found.',
+          videoId,
+        });
+        return;
       }
 
       const bestAudio = ytdl.chooseFormat(audioFormats, {
-        filter: 'audioonly', // Download only audio
-        quality: 'highestaudio', // Get the highest quality audio
+        filter: 'audioonly',
+        quality: 'highestaudio',
       });
       const fileExt =
         bestAudio.container === 'mp4' ? 'm4a' : bestAudio.container;
-      logger.info(
+      logger.verbose(
         `Selected format: ${bestAudio.container}, bitrate: ${bestAudio.audioBitrate} kbps`,
       );
 
@@ -64,9 +73,8 @@ async function downloadAudio(videoUrl, outputFolder = './') {
         fs.mkdirSync(outputFolder, { recursive: true });
       }
 
-      logger.info(`Starting download to ${outputPath}...`);
+      logger.verbose(`Starting download to ${outputPath}...`);
 
-      // Create download stream with audio-only filter
       const stream = ytdl(videoUrl, { format: bestAudio });
       const writeStream = fs.createWriteStream(outputPath);
 
@@ -77,19 +85,19 @@ async function downloadAudio(videoUrl, outputFolder = './') {
       });
 
       stream.on('finish', () => {
-        logger.info(`Download completed: ${outputPath}`);
-        resolve(outputPath); // Resolve the promise with the output path
+        logger.verbose(`Download completed: ${outputPath}`);
+        this.emit('success', { status: 200, videoId, outputPath });
       });
 
       stream.on('error', (error) => {
         logger.error(`Download failed: ${error.message}`);
-        reject(error); // Reject the promise on error
+        this.emit('error', { status: 500, message: error.message });
       });
     } catch (error) {
       logger.error(`Download failed: ${error.message}`);
-      reject(error);
+      this.emit('error', { status: 500, message: error.message });
     }
-  });
+  }
 }
 
-module.exports = { downloadAudio };
+module.exports = Downloader;

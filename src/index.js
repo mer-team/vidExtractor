@@ -1,6 +1,6 @@
 // src/index.js
 const { connectMessaging, sendMessage } = require('./messaging');
-const { downloadAudio, downloadTest } = require('./downloader');
+const Downloader = require('./downloader');
 const logger = require('./logger');
 const amqp = require('amqplib');
 
@@ -28,36 +28,58 @@ async function startService() {
     });
     channel = ch;
     await channel.assertQueue(QUEUE_IN);
-    logger.notice(`Waiting for messages in ${QUEUE_IN}...`);
+    logger.info(`Waiting for messages in ${QUEUE_IN}...`);
 
     channel.consume(QUEUE_IN, async (msg) => {
       if (msg) {
         const videoUrl = msg.content.toString();
-        logger.notice(`Message received: ${videoUrl}`);
-        try {
-          const outputPath = await downloadAudio(videoUrl, OUTPUT_FOLDER); // Wait for download to complete
-          logger.notice(`Audio downloaded: ${outputPath}`);
-          if (outputPath) {
-            // Create a notification message for the manager
-            const message = {
-              service: serviceName,
-              songId: videoUrl, // TODO: For a proper implementation, use a unique video ID
-              status: true,
-              payload: outputPath,
-              timestamp: new Date().toISOString(),
-            };
-            await sendMessage(channel, QUEUE_OUT, message); // Notify manager
-          }
-          channel.ack(msg); // Acknowledge the message only after processing
-        } catch (error) {
-          logger.error(`Error processing message: ${error.message}`);
-          channel.nack(msg); // Reject the message in case of an error
-        }
+        logger.info(`Message received: ${videoUrl}`);
+        const downloader = new Downloader();
+
+        downloader.on('success', async ({ status, videoId, outputPath }) => {
+          logger.info(`Audio downloaded: ${outputPath}`);
+          const message = {
+            service: serviceName,
+            songId: videoId,
+            status,
+            payload: outputPath,
+            timestamp: new Date().toISOString(),
+          };
+          await sendMessage(channel, QUEUE_OUT, message);
+          channel.ack(msg);
+        });
+
+        downloader.on('failure', async ({ status, message, videoId }) => {
+          logger.warn(`Download failed: ${message}`);
+          const notifyMessage = {
+            service: serviceName,
+            songId: videoId,
+            status,
+            message,
+            timestamp: new Date().toISOString(),
+          };
+          await sendMessage(channel, QUEUE_OUT, notifyMessage);
+          channel.ack(msg);
+        });
+
+        downloader.on('error', async ({ status, message }) => {
+          logger.error(`Error: ${message}`);
+          const errorMessage = {
+            service: serviceName,
+            status,
+            message,
+            timestamp: new Date().toISOString(),
+          };
+          await sendMessage(channel, QUEUE_OUT, errorMessage);
+          channel.nack(msg);
+        });
+
+        downloader.downloadAudio(videoUrl, OUTPUT_FOLDER);
       }
     });
 
     process.on('SIGINT', async () => {
-      logger.notice('Shutting down...');
+      logger.info('Shutting down...');
       await channel.close();
       process.exit();
     });
@@ -66,25 +88,6 @@ async function startService() {
   }
 }
 
-if (process.argv.length === 2) {
-  logger.notice('Starting service mode.');
-  startService();
-} else if (process.argv.length === 3) {
-  logger.info('Starting CLI mode.');
-  const videoUrl = process.argv[2];
-  if (videoUrl) {
-    downloadAudio(videoUrl, OUTPUT_FOLDER).then((output) => {
-      if (output) {
-        logger.info(`File saved at ${output}`);
-      }
-    });
-  } else {
-    logger.error('Please provide a YouTube URL as an argument.');
-    process.exit(1);
-  }
-} else {
-  logger.error('Invalid arguments.');
-  process.exit(1);
-}
+startService();
 
 logger.info('vidExtractor exiting.');
