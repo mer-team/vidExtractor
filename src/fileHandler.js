@@ -4,6 +4,7 @@ const path = require('path');
 const logger = require('./logger');
 
 function saveFile(filePath, dataStream) {
+  logger.info(`starting saving file to ${filePath}`);
   return new Promise((resolve, reject) => {
     const fullPath = path.resolve(filePath);
     const writeStream = fs.createWriteStream(fullPath);

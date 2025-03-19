@@ -1,3 +1,6 @@
+# Ignore downloaded audios
+audios/
+
 # Logs
 logs
 *.log

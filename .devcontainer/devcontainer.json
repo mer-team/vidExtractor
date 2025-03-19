@@ -1,9 +1,9 @@
 {
   "name": "vid-extractor",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "vid-extractor",
+  "workspaceFolder": "/workspaces/vid-extractor",
+  "shutdownAction": "stopCompose",
   "remoteUser": "node",
   "customizations": {
     "vscode": {
@@ -37,7 +37,6 @@
     "NODE_ENV": "development"
   },
   "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
-  ],
-  "runArgs": ["--env-file", "${localWorkspaceFolder}/.env"]
+    "source=${localWorkspaceFolder},target=/workspaces/vid-extractor,type=bind,consistency=cached"
+  ]
 }

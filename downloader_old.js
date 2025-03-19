@@ -1,20 +1,16 @@
-const ytdl = require('@distube/ytdl-core');
-const fs = require('fs');
-const path = require('path');
-const logger = require('./logger');
+// src/downloader.js
+const ytdl = require('ytdl-core');
 const ProgressBar = require('progress');
+const { saveFile } = require('./fileHandler');
+const logger = require('./logger');
 
 async function downloadAudio(videoUrl, outputFolder = './') {
   try {
-    logger.info(`Starting download for URL: ${videoUrl}`);
-
-    // Validate URL
     if (!ytdl.validateURL(videoUrl)) {
       logger.error('Invalid YouTube URL.');
-      return;
+      return null;
     }
 
-    // Get video ID and create filename
     const info = await ytdl.getInfo(videoUrl);
     const videoId = info.videoDetails.videoId;
     const videoCategory = info.videoDetails.category;
@@ -39,8 +35,7 @@ async function downloadAudio(videoUrl, outputFolder = './') {
     }
 
     const bestAudio = ytdl.chooseFormat(audioFormats, {
-      filter: 'audioonly', // Download only audio
-      quality: 'highestaudio', // Get the highest quality audio
+      quality: 'highestaudio',
     });
     const fileExt = bestAudio.container === 'mp4' ? 'm4a' : bestAudio.container;
     logger.info(
@@ -49,36 +44,26 @@ async function downloadAudio(videoUrl, outputFolder = './') {
 
     const totalBytes = parseInt(bestAudio.contentLength, 10);
     const progressBar = new ProgressBar(
-      'Downloading [:bar] :rate/kbps :percent :etas',
+      'Downloading [:bar] :rate/bps :percent :etas',
       {
         total: totalBytes,
         width: 40,
       },
     );
-
-    const filename = `${videoId}.${fileExt}`;
-    const outputPath = path.join(outputFolder, filename);
-
-    // Create output folder if it doesn't exist
-    if (!fs.existsSync(outputFolder)) {
-      fs.mkdirSync(outputFolder, { recursive: true });
-    }
-
-    logger.info(`Starting download to ${outputPath}...`);
-
-    // Create download stream with audio-only filter
-    const stream = ytdl(videoUrl, { format: bestAudio });
-
-    stream.pipe(fs.createWriteStream(outputPath));
-    stream.on('progress', (chunkLength) => {
+    logger.info(`progress bar started`);
+    const audioStream = ytdl(videoUrl, { format: bestAudio });
+    audioStream.on('progress', (chunkLength) => {
       progressBar.tick(chunkLength);
     });
-    stream.on('finish', function () {
-      logger.info(`Download completed: ${outputPath}`);
-      return outputPath;
-    });
+
+    const filename = `${videoId}.${fileExt}`;
+    const outputPath = `${outputFolder}/${filename}`;
+    await saveFile(outputPath, audioStream);
+
+    return outputPath;
   } catch (error) {
-    logger.error(`Download failed: ${error.message}`);
+    logger.error(`Download failed: ${error}`);
+    return null;
   }
 }
 

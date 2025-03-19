@@ -1,6 +1,6 @@
 // src/index.js
 const { connectMessaging, sendMessage } = require('./messaging');
-const { downloadAudio } = require('./downloader');
+const { downloadAudio, downloadTest } = require('./downloader');
 const logger = require('./logger');
 const amqp = require('amqplib');
 
@@ -8,13 +8,14 @@ const amqp = require('amqplib');
 const {
   USER = 'guest',
   PASS = 'guest',
-  HOST = 'localhost',
+  HOST = 'rabbitmq',
   PORT = '5672',
   QUEUE_IN = 'yt-download',
   QUEUE_OUT = 'mer-manager',
 } = process.env;
 
 const serviceName = 'yt_downloader';
+const OUTPUT_FOLDER = '/audios'; // Define the output folder as a constant
 let channel;
 
 async function startService() {
@@ -33,7 +34,8 @@ async function startService() {
       if (msg) {
         const videoUrl = msg.content.toString();
         logger.info(`Received message: ${videoUrl}`);
-        const outputPath = await downloadAudio(videoUrl, './Audios');
+        const outputPath = await downloadAudio(videoUrl, OUTPUT_FOLDER);
+        logger.info(`Downloaded audio to: ${outputPath}`);
         if (outputPath) {
           // Create a notification message for the manager
           const message = {
@@ -66,7 +68,7 @@ if (process.argv.length === 2) {
   logger.info('Starting CLI mode.');
   const videoUrl = process.argv[2];
   if (videoUrl) {
-    downloadAudio(videoUrl, './Audios').then((output) => {
+    downloadAudio(videoUrl, OUTPUT_FOLDER).then((output) => {
       if (output) {
         logger.info(`File saved at ${output}`);
       }

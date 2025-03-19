@@ -299,7 +299,7 @@ async function startService() {
       if (msg !== null) {
         var url = msg.content.toString();
         console.log(' [%s] Received a new message: %s', greenCheckbox, url);
-        await downloadAudio(url, './Audios');
+        await downloadAudio(url, '/audios');
         channel.ack(msg); // Acknowledge the message, TODO: if success only?
 
         console.log(

@@ -2,19 +2,22 @@
 FROM node:22
 
 # Set working directory
-WORKDIR /workspace
+WORKDIR /workspaces/vid-extractor
 
 # Copy package files first to leverage caching
 COPY package*.json ./
 
-# Create folder for the audios
-RUN mkdir -p /workspace/Audios
+# Create folder for the audios and change ownership to the node user
+RUN mkdir -p /audios && chown -R node:node /audios
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the project files
 COPY . .
+
+# Switch to the non-root user
+# USER node
 
 # Expose ports (for metrics with Prometheus later)
 # EXPOSE 9100
