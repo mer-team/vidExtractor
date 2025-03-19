@@ -28,31 +28,36 @@ async function startService() {
     });
     channel = ch;
     await channel.assertQueue(QUEUE_IN);
-    logger.info(`Waiting for messages in ${QUEUE_IN}...`);
+    logger.notice(`Waiting for messages in ${QUEUE_IN}...`);
 
     channel.consume(QUEUE_IN, async (msg) => {
       if (msg) {
         const videoUrl = msg.content.toString();
-        logger.info(`Received message: ${videoUrl}`);
-        const outputPath = await downloadAudio(videoUrl, OUTPUT_FOLDER);
-        logger.info(`Downloaded audio to: ${outputPath}`);
-        if (outputPath) {
-          // Create a notification message for the manager
-          const message = {
-            service: serviceName,
-            songId: videoUrl, // TODO: For a proper implementation, use a unique video ID
-            status: true,
-            payload: outputPath,
-            timestamp: new Date().toISOString(),
-          };
-          await sendMessage(channel, QUEUE_OUT, message);
+        logger.notice(`Message received: ${videoUrl}`);
+        try {
+          const outputPath = await downloadAudio(videoUrl, OUTPUT_FOLDER); // Wait for download to complete
+          logger.notice(`Audio downloaded: ${outputPath}`);
+          if (outputPath) {
+            // Create a notification message for the manager
+            const message = {
+              service: serviceName,
+              songId: videoUrl, // TODO: For a proper implementation, use a unique video ID
+              status: true,
+              payload: outputPath,
+              timestamp: new Date().toISOString(),
+            };
+            await sendMessage(channel, QUEUE_OUT, message); // Notify manager
+          }
+          channel.ack(msg); // Acknowledge the message only after processing
+        } catch (error) {
+          logger.error(`Error processing message: ${error.message}`);
+          channel.nack(msg); // Reject the message in case of an error
         }
-        channel.ack(msg);
       }
     });
 
     process.on('SIGINT', async () => {
-      logger.info('Shutting down...');
+      logger.notice('Shutting down...');
       await channel.close();
       process.exit();
     });
@@ -62,7 +67,7 @@ async function startService() {
 }
 
 if (process.argv.length === 2) {
-  logger.info('Starting service mode.');
+  logger.notice('Starting service mode.');
   startService();
 } else if (process.argv.length === 3) {
   logger.info('Starting CLI mode.');
