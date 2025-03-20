@@ -34,20 +34,11 @@ sequenceDiagram
 
 ---
 
-## 🏗️ DevContainer Setup
+## 🚀 Development Setup
 
-### Requirements
+### Using DevContainer (Recommended)
 
-- Windows: [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) and [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)
-- [Docker](https://www.docker.com/get-started)
-- [VS Code](https://code.visualstudio.com/)
-- [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-
-### How to Start the DevContainer
-
-In case you missed, start by reading our Development Environment setup guide which introduces WSL2, VSCode, Docker, mise and git via SSH.
-
-1. Clone this repository inside WSL2:
+1. Clone the repository:
    ```bash
    git clone https://github.com/mer-team/vidExtractor.git
    cd vidExtractor
@@ -71,45 +62,71 @@ The most relevant files and folders are:
 
 ```
 📦 vid-extractor
-├── 📂 .devcontainer      # DevContainer configuration
-│   ├── Dockerfile        # Base Dockerfile for the container
-│   ├── devcontainer.json # DevContainer settings
-├── 📂 src               # Project source code
-│   ├── downloader.js     # Handles audio downloading from YouTube
-│   ├── logger.js         # Configures logging with Winston
-│   ├── streamLogger.js   # Logs available audio/video streams for debugging
-│   ├── index.js          # Application entry point
-├── 📂 test               # Unit tests
-│   ├── test.js           # Tests RabbitMQ integration and file downloads
-├── 📜 package.json      # Node.js dependencies and configuration
-├── 📜 .env               # Environment variables (create or edit as needed)
-├── 📜 .eslintrc.js      # ESLint configuration
-├── 📜 .prettierrc.js    # Prettier configuration
-├── 📜 application.log   # Main log file (rotates automatically)
-└── 📜 README.md         # Project documentation
+├── 📂 .devcontainer                 # DevContainer configuration
+│   ├── Dockerfile                   # Base Dockerfile for the container
+│   ├── docker-compose.yml            # Defines services for development
+│   └── devcontainer.json            # DevContainer settings
+├── 📂 src                           # Project source code
+│   ├── downloader.js                # Handles audio downloading from YouTube
+│   ├── logger.js                    # Configures logging with Winston
+│   ├── streamLogger.js              # Logs available audio/video streams for debugging
+│   ├── messaging.js                 # RabbitMQ connection logic
+│   └── index.js                     # Application entry point
+├── 📂 test                          # Unit tests (in this case e2e)
+│   └── test.js                      # Tests RabbitMQ integration and file downloads
+├── 📂 coverage                      # Coverage reports generated after running tests
+├── 📜 package.json                  # Node.js dependencies and configuration
+├── 📜 .env                          # Environment variables (used in production)
+├── 📜 .env.dev                      # Development environment variables (devcontainer)
+├── 📜 eslint.config.mjs             # ESLint configuration
+├── 📜 Dockerfile                    # Production Docker image definition
+├── 📜 application_YYYY-MM-DD.log    # Log files (rotates automatically)
+└── 📜 README.md                     # Project documentation
 ```
+
+---
+
+## 📦 Libraries Used
+
+The project uses the following libraries:
+
+### Dependencies
+
+- **[amqplib](https://www.npmjs.com/package/amqplib)**: For RabbitMQ integration in tests.
+- **[@distube/ytdl-core](https://www.npmjs.com/package/@distube/ytdl-core)**: For downloading YouTube videos.
+- **[cli-table3](https://www.npmjs.com/package/cli-table3)**: For formatting tables in the console (only when LOG_LEVEL=debug).
+- **[progress](https://www.npmjs.com/package/progress)**: For displaying download progress bars.
+- **[winston](https://www.npmjs.com/package/winston)**: For logging.
+- **[winston-daily-rotate-file](https://www.npmjs.com/package/winston-daily-rotate-file)**: For log rotation.
+- **[ytdl-core](https://www.npmjs.com/package/ytdl-core)**: YouTube video downloader (used via alias).
+
+### Dev Dependencies
+
+- **[chai](https://www.npmjs.com/package/chai)**: For assertions in tests.
+- **[mocha](https://www.npmjs.com/package/mocha)**: For running tests.
+- **[nyc](https://www.npmjs.com/package/nyc)**: For test coverage.
+- **[eslint](https://www.npmjs.com/package/eslint)**: For linting with the new flat config format.
+- **[prettier](https://www.npmjs.com/package/prettier)**: For code formatting.
 
 ### Log Files
 
-- **`application.log`**: The main log file where all application events are recorded. It rotates automatically based on size or time, ensuring logs remain manageable.
-- **Rotated Logs**: Older logs are archived with timestamps or incremental numbers (e.g., `application.log.1`, `application.log.2`).
-- **Log Levels**: Controlled by the `LOG_LEVEL` environment variable. Supported levels are `debug`, `info`, `warn`, and `error`.
+- **`application-YYYY-MM-DD.log`**: The main log file where all application events are recorded. It rotates automatically based on size or time, ensuring logs remain manageable.
+- **Rotated Logs**: Older logs are archived with timestamps.
+- **Log Levels**: Controlled by the `LOG_LEVEL` environment variable. Supported levels are `debug`, `info` (default), `warn`, and `error`.
 
 ---
 
 ## 📦 Service Logic
 
+Both input and output queues can be configured using .env vars, default names are being used here.
+
 ### Input Queue: `yt-download`
 
 The service listens to the `yt-download` queue for messages containing download requests. Each message must follow this format:
 
-```json
-{
-  "videoUrl": "https://www.youtube.com/watch?v=example"
-}
+```plaintext
+https://www.youtube.com/watch?v=example
 ```
-
-- **`videoUrl`**: The URL of the YouTube video to download.
 
 ### Processing Logic
 
@@ -205,12 +222,12 @@ When `LOG_LEVEL=debug`, the service logs all available audio and video streams i
 
 ## 🔧 Available Commands (`package.json`)
 
-Several commands are defined under `package.json`, check it for details.
+Several commands are available for development, testing, and code quality:
 
 ```bash
 npm start             # run the application
 npm run dev           # run in dev mode (with node watch for hot reloading)
-npm test              # run unit tests
+npm test              # run unit tests with coverage reports
 npm run lint          # check code for errors
 npm run lint:fix      # automatically fix issues
 npm run prettier      # check formatting issues
@@ -226,14 +243,16 @@ The microservice is designed to run as part of a larger system, orchestrated by 
 
 ### Required Environment Variables
 
-| Variable | Default   | Description                       |
-| -------- | --------- | --------------------------------- |
-| HOST     | localhost | RabbitMQ host                     |
-| USER     | guest     | RabbitMQ username                 |
-| PASS     | guest     | RabbitMQ password                 |
-| PORT     | 5672      | RabbitMQ communication port       |
-| MNG_PORT | 15672     | RabbitMQ management UI port       |
-| TIME     | 10        | Timeout check for service startup |
+| Variable            | Default     | Description                              |
+| ------------------- | ----------- | ---------------------------------------- |
+| NODE_ENV            | development | Node running mode                        |
+| RABBITMQ_HOST       | rabbitmq    | RabbitMQ host                            |
+| RABBITMQ_USER       | guest       | RabbitMQ username                        |
+| RABBITMQ_PASS       | guest       | RabbitMQ password                        |
+| RABBITMQ_PORT       | 5672        | RabbitMQ communication port              |
+| VID_EXTRACTOR_QUEUE | yt-download | Queue where it expects jobs              |
+| MER_MANAGER_QUEUE   | mer-manager | Queue used to notify the manager service |
+| LOG_LEVEL           | info        | Log level to be used by Winston          |
 
 ### Required Volumes
 
@@ -243,10 +262,10 @@ The microservice is designed to run as part of a larger system, orchestrated by 
 
 ### Running Locally with Dev-Orchestrator
 
-Start the RabbitMQ service using `dev-orchestrator`:
+Start the RabbitMQ service defined in `dev-orchestrator`:
 
 ```bash
-docker network create dev-net
+docker network create mermaid-dev-network
 cd path/to/dev-orchestrator
 docker-compose up -d rabbitmq
 ```
@@ -262,17 +281,19 @@ docker build -t vidextractor:local .
 #### Run Locally Using the Built Image
 
 ```bash
-docker run --rm --network=dev-net \
-  -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=rabbitmq -e MNG_PORT=15672 \
-  -v "$(pwd)/Audios":/vidExtractor/Audios vidextractor:local
+docker run --rm --network=mermaid-dev-network \
+  --env-file .env \
+  -v "$(pwd)/audios":/audios vidextractor:local
 ```
 
 #### Run the Official Image Locally
 
+Note: a new version is still to be pushed
+
 ```bash
-docker run --network=dev-net \
-  -e TIME=10 -e USER=merUser -e PASS=passwordMER -e HOST=rabbitmq -e MNG_PORT=15672 \
-  -v "$(pwd)/Audios":/vidExtractor/Audios merteam/vidextractor:latest
+docker run --network=mermaid-dev-network \
+  --env-file .env \
+  -v "$(pwd)/audios":/audios merteam/vidextractor:latest
 ```
 
 ---
@@ -286,6 +307,7 @@ docker run --network=dev-net \
 - **Winston** (for logging with log rotation)
 - **Progress** (for tracking download progress)
 - **ESLint & Prettier** (for code quality)
-- **Mocha** (for unit testing)
+- **Mocha & Chai** (for unit testing)
+- **NYC** (for test coverage)
 
 ---

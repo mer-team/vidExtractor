@@ -3,7 +3,7 @@ const fs = require('fs');
 const amqp = require('amqplib');
 const ProgressBar = require('progress');
 const path = require('path');
-const { logAvailableStreams } = require('./streamLogger');
+const { logAvailableStreams } = require('../streamLogger');
 
 const greenCheckbox = '\x1b[32m\u2713\x1b[0m'; // Green checkbox with ANSI escape codes
 const yellowInfo = `\x1b[33mℹ\x1b[0m`; // Yellow info character with ANSI escape codes

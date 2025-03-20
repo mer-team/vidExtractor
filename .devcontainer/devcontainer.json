@@ -10,7 +10,7 @@
       "settings": {
         "eslint.workingDirectories": [{ "mode": "auto" }],
         "prettier.requireConfig": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "esbenp.prettier-vscode", //"dbaeumer.vscode-eslint", //
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": "explicit"
@@ -23,13 +23,13 @@
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
         "christian-kohler.path-intellisense",
-        "burkeholland.simple-react-snippets",
         "mutantdino.resourcemonitor",
         "waderyan.gitblame",
-        "mhutchie.git-graph",
+        "donjayamanne.githistory",
         "vincaslt.highlight-matching-tag",
         "vscode-icons-team.vscode-icons",
-        "bierner.markdown-mermaid"
+        "bierner.markdown-mermaid",
+        "ms-azuretools.vscode-docker"
       ]
     }
   },

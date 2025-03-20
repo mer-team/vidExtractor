@@ -13,7 +13,7 @@ class Downloader extends EventEmitter {
 
       // Validate URL
       if (!ytdl.validateURL(videoUrl)) {
-        this.emit('error', { status: 400, message: 'Invalid YouTube URL.' });
+        this.emit('failure', { status: 400, message: 'Invalid YouTube URL.' });
         return;
       }
 

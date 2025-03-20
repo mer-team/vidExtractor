@@ -9,7 +9,7 @@ services:
     environment:
       NODE_ENV: development
     env_file:
-      - ../.env
+      - ../.env.dev # Use the .env.dev file for development
     networks:
       - mermaid-dev-network
     command: sleep infinity

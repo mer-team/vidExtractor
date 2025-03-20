@@ -30,4 +30,20 @@ async function sendMessage(channel, queue, message) {
   }
 }
 
-module.exports = { connectMessaging, sendMessage };
+async function connectWithRetry(config, retries = 5, delay = 5000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const { connection, channel: ch } = await connectMessaging(config);
+      return { connection, channel: ch };
+    } catch (error) {
+      logger.warn(
+        `RabbitMQ connection failed. Retrying in ${delay / 1000} seconds...`,
+      );
+      if (i < retries - 1)
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      else throw error;
+    }
+  }
+}
+
+module.exports = { connectMessaging, sendMessage, connectWithRetry };

@@ -1,0 +1,15 @@
+{
+  "extends": "@istanbuljs/nyc-config-babel",
+  "all": true,
+  "include": ["src/**/*.js"],
+  "exclude": [
+    "test/**/*.js",
+    "node_modules",
+    "src/bak/vidExtractorScript.js",
+    "src/bak/ytdlOriginal.js"
+  ],
+  "reporter": ["text", "html"],
+  "report-dir": "./coverage",
+  "instrument": true,
+  "sourceMap": false
+}

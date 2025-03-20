@@ -15,7 +15,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "test": "npx mocha src/test/test.js --timeout 10000",
+    "test": "npx nyc --instrument -- mocha test/test.js --timeout 10000",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier . --check",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.15.9",
+    "amqplib": "^0.10.5",
     "cli-table3": "^0.6.3",
     "progress": "^2.0.3",
     "winston": "^3.3.3",
@@ -32,7 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
-    "amqplib": "^0.10.5",
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
     "assert": "^2.1.0",
     "chai": "^5.2.0",
     "eslint": "^9.22.0",
@@ -40,6 +41,7 @@
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^16.0.0",
     "mocha": "^10.8.2",
+    "nyc": "^15.1.0",
     "prettier": "3.5.3"
   }
 }

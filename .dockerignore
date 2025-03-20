@@ -6,3 +6,7 @@ npm-debug.log
 .coverage.*
 .env
 .aws
+coverage/
+*.log
+Dockerfile
+docker-compose.yml
