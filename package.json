@@ -40,8 +40,8 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^16.0.0",
-    "mocha": "^10.8.2",
-    "nyc": "^15.1.0",
+    "mocha": "^11.1.0",
+    "nyc": "^17.1.0",
     "prettier": "3.5.3"
   }
 }
