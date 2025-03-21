@@ -311,3 +311,11 @@ docker run --network=mermaid-dev-network \
 - **NYC** (for test coverage)
 
 ---
+
+## Important Notes
+
+- RabbitMQ messages should be standardized
+- YTDL library fixed to 15.x, there's a bug in 16.x that currently gives 403
+- Debugger still to be configured
+- GitHub Actions need to be updated (and improved)
+- Also need to setup husky git hooks

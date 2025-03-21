@@ -6,23 +6,23 @@ ENV NODE_ENV=production
 # Install dependencies
 RUN apk --no-cache add curl
 
-# Set working directory
+# Set working directory and ensure it is owned by the node user
 WORKDIR /vid-extractor
 
 # Copy package.json and package-lock.json first to leverage caching
-COPY ./src/package*.json ./
+COPY ./package*.json ./
 
 # Install dependencies
-RUN npm install --only=production
+RUN npm install --omit=dev
 
-# Copy application source code
-COPY ./src /vid-extractor
-
-# Create folder for the audios and change ownership to the node user
-RUN mkdir -p /audios && chown -R node:node /audios
+# Create folder for the audios and ensure it is owned by the node user
+RUN mkdir -p /audios && chown -R node:node /vid-extractor /audios
 
 # Set the default user to node for better security
 USER node
+
+# Copy application source code
+COPY ./src /vid-extractor
 
 # Expose necessary ports (optional, based on your app's requirements)
 EXPOSE 3000
