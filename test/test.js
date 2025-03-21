@@ -127,6 +127,10 @@ describe('vid-extractor microservice tests', () => {
   }
 
   it('Should process a valid YouTube link and create a file', async function () {
+    if (process.env.GITHUB_ACTIONS) {
+      this.skip(); // Skip the test in GitHub Actions
+    }
+
     this.timeout(30000); // Extend timeout for download
 
     // Send a valid YouTube link to the VID_EXTRACTOR_QUEUE
@@ -166,6 +170,10 @@ describe('vid-extractor microservice tests', () => {
   });
 
   it('Should handle a non-music video gracefully', async function () {
+    if (process.env.GITHUB_ACTIONS) {
+      this.skip(); // Skip the test in GitHub Actions
+    }
+
     this.timeout(7000); // Extend timeout for processing
 
     // Send a non-music category video link to the VID_EXTRACTOR_QUEUE

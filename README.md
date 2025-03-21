@@ -235,6 +235,8 @@ npm run prettier:fix  # automatically fix formatting issues
 npm run format        # runs prettier:fix and lint:fix together
 ```
 
+Note: some of the automated tests run only locally to avoid the limitations of GitHub Actions (cannot or should not connect to outside services such as YouTube).
+
 ---
 
 ## 📦 Running the Microservice
