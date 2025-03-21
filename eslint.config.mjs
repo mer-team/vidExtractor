@@ -16,7 +16,7 @@ export default [
     },
   },
   {
-    ignores: ['.dockerignore'], // Add .dockerignore to the ignored files
+    ignores: ['.dockerignore', 'src/bak/**/*.js'], // Add .dockerignore to the ignored files
   },
   pluginJs.configs.recommended,
   {

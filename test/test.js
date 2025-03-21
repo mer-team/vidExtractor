@@ -92,7 +92,9 @@ describe('vid-extractor microservice tests', () => {
   it('Should start the service and log the correct message', async () => {
     const logs = fs.readFileSync(serviceLogFile, 'utf-8');
     assert.ok(
-      logs.includes(`Service started. Waiting for messages in ${VID_EXTRACTOR_QUEUE}...`),
+      logs.includes(
+        `Service started. Waiting for messages in ${VID_EXTRACTOR_QUEUE}...`,
+      ),
       'Service did not start correctly',
     );
     assert.ok(
