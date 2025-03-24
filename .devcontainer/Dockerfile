@@ -4,6 +4,10 @@ FROM node:22
 # Set working directory
 WORKDIR /workspaces/vid-extractor
 
+# Install Hadolint
+RUN curl -Lo /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64 && \
+    chmod +x /usr/local/bin/hadolint
+
 # Copy package files first to leverage caching
 COPY package*.json ./
 

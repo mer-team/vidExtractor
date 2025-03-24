@@ -10,7 +10,7 @@
       "settings": {
         "eslint.workingDirectories": [{ "mode": "auto" }],
         "prettier.requireConfig": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode", //"dbaeumer.vscode-eslint", //
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": "explicit"
@@ -29,7 +29,11 @@
         "vincaslt.highlight-matching-tag",
         "vscode-icons-team.vscode-icons",
         "bierner.markdown-mermaid",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "exiasr.hadolint",
+        "davidanson.vscode-markdownlint",
+        "github.copilot",
+        "github.copilot-chat"
       ]
     }
   },

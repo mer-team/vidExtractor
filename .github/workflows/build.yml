@@ -38,6 +38,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v2
+        with:
+          dockerfile: |
+            Dockerfile
+            .devcontainer/Dockerfile
+
       - name: Create output directory
         run: mkdir -p ${{ env.OUTPUT_FOLDER }}
 

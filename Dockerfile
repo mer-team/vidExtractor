@@ -4,7 +4,7 @@ FROM node:22-alpine
 ENV NODE_ENV=production
 
 # Install dependencies
-RUN apk --no-cache add curl
+RUN apk --no-cache add curl=8.2.1-r1
 
 # Set working directory and ensure it is owned by the node user
 WORKDIR /vid-extractor

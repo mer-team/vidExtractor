@@ -10,3 +10,9 @@ coverage/
 *.log
 Dockerfile
 docker-compose.yml
+
+# Husky hooks
+.husky/_
+
+# Lint-staged cache
+.lintstagedrc

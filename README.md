@@ -39,11 +39,13 @@ sequenceDiagram
 ### Using DevContainer (Recommended)
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/mer-team/vidExtractor.git
    cd vidExtractor
    code . # this opens VSCode
    ```
+
 2. Inside VS Code select **"Reopen in Container"**.
 3. The DevContainer will automatically build and install dependencies using `npm install`.
 4. Under VSCode open a terminal, branch, code and push.
@@ -60,7 +62,7 @@ Ctrl + Shift + P > "Dev Containers: Rebuild Container"
 
 The most relevant files and folders are:
 
-```
+```plaintext
 📦 vid-extractor
 ├── 📂 .devcontainer                 # DevContainer configuration
 │   ├── Dockerfile                   # Base Dockerfile for the container
@@ -311,6 +313,68 @@ docker run --network=mermaid-dev-network \
 - **ESLint & Prettier** (for code quality)
 - **Mocha & Chai** (for unit testing)
 - **NYC** (for test coverage)
+
+---
+
+## 🔧 Linter Tools and Commit Guidelines
+
+### Linter Tools
+
+To ensure code quality and consistency, the following linter tools are used in this project:
+
+1. **Hadolint**: A linter for Dockerfiles to enforce best practices and avoid common errors.
+2. **YAML-Lint**: A linter for YAML files to validate syntax and structure.
+3. **ESLint & Prettier**: For JavaScript/TypeScript code linting and formatting.
+
+These tools are integrated into the CI pipeline and run automatically during development.
+
+### Pre-Commit Hooks with Husky
+
+We use **Husky** to enforce pre-commit checks. The following tasks are executed before a commit is allowed:
+
+- **ESLint**: Ensures JavaScript/TypeScript code adheres to the defined linting rules.
+- **Prettier**: Ensures code formatting consistency.
+- **yaml-lint**: Lints the yml files.
+- **hadolint**: Ensures the Dockerfiles that are present follow the rules too.
+- **Commitlint**: Validates commit messages against the project's commit message conventions.
+
+### Commitlint Configuration
+
+Commitlint enforces a structured format for commit messages to maintain a clean and readable Git history. The format is as follows:
+
+```plaintext
+<type>(<scope>): <subject>
+```
+
+- **`type`**: Specifies the type of change. Allowed values are:
+
+  - `build`: Changes that affect the build system or external dependencies (e.g., `npm`, `docker`).
+  - `ci`: Changes to CI configuration files and scripts.
+  - `chore`: Maintenance tasks (e.g., dependency updates).
+  - `docs`: Documentation changes.
+  - `feat`: A new feature.
+  - `fix`: A bug fix.
+  - `perf`: Performance improvements.
+  - `refactor`: Code refactoring without changing functionality.
+  - `revert`: Reverts a previous commit.
+  - `style`: Code style changes (e.g., formatting, missing semicolons).
+  - `test`: Adding or modifying tests.
+
+- **`scope`**: (Optional) Specifies the area of the codebase affected (e.g., `downloader`, `logger`).
+- **`subject`**: A brief description of the change (imperative mood, sentence-case).
+
+#### Examples
+
+- `feat(downloader): Add support for new audio format`
+- `fix(logger): Resolve crash on invalid log level`
+- `docs(readme): Update setup instructions`
+
+#### Additional Rules
+
+- **Body Line Length**: Commit message body lines must not exceed 100 characters.
+- **Subject Case**: The subject must use sentence case (e.g., "Add support for new audio format").
+
+By following these conventions, we ensure a consistent and meaningful commit history.
 
 ---
 
