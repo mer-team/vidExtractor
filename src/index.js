@@ -38,45 +38,52 @@ async function startService() {
         logger.info(`Message received: ${videoUrl}`);
         const downloader = new Downloader();
 
-        downloader.on('success', async ({ status, videoId, outputPath }) => {
-          logger.info(`Audio downloaded: ${outputPath}`);
-          const message = {
-            service: serviceName,
-            songId: videoId,
-            status,
-            payload: outputPath,
-            timestamp: new Date().toISOString(),
-          };
-          await sendMessage(channel, MER_MANAGER_QUEUE, message);
-          channel.ack(msg);
-        });
+        try {
+          downloader.on('success', async ({ status, videoId, outputPath }) => {
+            logger.info(`Audio downloaded: ${outputPath}`);
+            const message = {
+              service: serviceName,
+              songId: videoId,
+              status,
+              payload: outputPath,
+              timestamp: new Date().toISOString(),
+            };
+            await sendMessage(channel, MER_MANAGER_QUEUE, message);
+            channel.ack(msg); // Acknowledge the message only after successful processing
+          });
 
-        downloader.on('failure', async ({ status, message, videoId }) => {
-          logger.warn(`Download failed: ${message}`);
-          const notifyMessage = {
-            service: serviceName,
-            songId: videoId || null, // Ensure videoId is included even if null
-            status: status || 400, // Default to 400 if no status is provided
-            message,
-            timestamp: new Date().toISOString(),
-          };
-          await sendMessage(channel, MER_MANAGER_QUEUE, notifyMessage); // Ensure message is sent
-          channel.ack(msg);
-        });
+          downloader.on('failure', async ({ status, message, videoId }) => {
+            logger.warn(`Download failed: ${message}`);
+            const notifyMessage = {
+              service: serviceName,
+              songId: videoId || null,
+              status: status || 400,
+              message,
+              timestamp: new Date().toISOString(),
+            };
+            await sendMessage(channel, MER_MANAGER_QUEUE, notifyMessage);
+            channel.ack(msg); // Acknowledge the message even on failure
+          });
 
-        downloader.on('error', async ({ status, message }) => {
-          logger.error(`Error: ${message}`);
-          const errorMessage = {
-            service: serviceName,
-            status: status || 500, // Default to 500 if no status is provided
-            message,
-            timestamp: new Date().toISOString(),
-          };
-          await sendMessage(channel, MER_MANAGER_QUEUE, errorMessage);
-          channel.ack(msg);
-        });
+          downloader.on('error', async ({ status, message }) => {
+            logger.error(`Error: ${message}`);
+            const errorMessage = {
+              service: serviceName,
+              status: status || 500,
+              message,
+              timestamp: new Date().toISOString(),
+            };
+            await sendMessage(channel, MER_MANAGER_QUEUE, errorMessage);
+            channel.ack(msg); // Acknowledge the message even on error
+          });
 
-        downloader.downloadAudio(videoUrl, OUTPUT_FOLDER);
+          downloader.downloadAudio(videoUrl, OUTPUT_FOLDER);
+        } catch (error) {
+          logger.error(
+            `Unhandled error during message processing: ${error.message}`,
+          );
+          channel.nack(msg, false, false); // Reject the message without requeueing
+        }
       }
     });
 
@@ -95,6 +102,16 @@ async function startService() {
     process.exit(1); // Exit if RabbitMQ is not reachable after retries
   }
 }
+
+process.on('uncaughtException', (error) => {
+  logger.error(`Uncaught exception: ${error.message}`);
+  process.exit(1); // Exit the application gracefully
+});
+
+process.on('unhandledRejection', (reason) => {
+  logger.error(`Unhandled promise rejection: ${reason}`);
+  process.exit(1); // Exit the application gracefully
+});
 
 startService();
 

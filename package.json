@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:mer-team/mermaid-fe.git"
+    "url": "git@github.com:mer-team/vidExtractor.git"
   },
   "author": "MERmaid Team (https://github.com/orgs/mer-team/people)",
   "scripts": {
@@ -28,7 +28,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@distube/ytdl-core": "^4.15.9",
+    "@distube/ytdl-core": "^4.16.5",
     "amqplib": "^0.10.5",
     "cli-table3": "^0.6.3",
     "progress": "^2.0.3",
@@ -39,11 +39,11 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
-    "@eslint/js": "^9.22.0",
+    "@eslint/js": "^9.23.0",
     "@istanbuljs/nyc-config-babel": "^3.0.0",
     "assert": "^2.1.0",
     "chai": "^5.2.0",
-    "eslint": "^9.22.0",
+    "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-security": "^3.0.1",

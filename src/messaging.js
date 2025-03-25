@@ -9,10 +9,21 @@ async function connectMessaging(config) {
   try {
     const connection = await amqp.connect(url);
     const channel = await connection.createChannel();
+
+    // Handle channel errors
+    channel.on('error', (error) => {
+      logger.error(`RabbitMQ channel error: ${error.message}`);
+    });
+
+    // Handle channel closure
+    channel.on('close', () => {
+      logger.warn('RabbitMQ channel closed.');
+    });
+
     logger.info(`Connected to RabbitMQ at ${host}:${port}`);
     return { connection, channel };
   } catch (error) {
-    logger.error(`RabbitMQ connection failed: ${error}`);
+    logger.error(`RabbitMQ connection failed: ${error.message}`);
     throw error;
   }
 }

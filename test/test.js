@@ -145,6 +145,7 @@ describe('vid-extractor microservice tests', () => {
 
     // Check if the file was created in the OUTPUT_FOLDER with a valid extension
     const downloadedFile = allowedContainers.some((ext) =>
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.existsSync(path.join(OUTPUT_FOLDER, `${validVideoId}.${ext}`)),
     );
 
@@ -188,6 +189,7 @@ describe('vid-extractor microservice tests', () => {
 
     // Ensure no file is created for the non-music video
     const nonMusicFile = allowedContainers.some((ext) =>
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.existsSync(path.join(OUTPUT_FOLDER, `${nonMusicVideoId}.${ext}`)),
     );
     assert.ok(!nonMusicFile, 'File should not exist for non-music video');
