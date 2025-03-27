@@ -1,0 +1,19 @@
+services:
+  vid-extractor:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspaces/vid-extractor:cached
+    #  - ../audios:/workspaces/vid-extractor/audios
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ../.env.dev # Use the .env.dev file for development
+    networks:
+      - mermaid-dev-network
+    command: sleep infinity
+
+networks:
+  mermaid-dev-network:
+    external: true

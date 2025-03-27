@@ -1,62 +1,87 @@
-name: vidExtractor Node.js CI/CD
+name: vidExtractor CI
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
-
+        node-version: [22.x]
     env:
       MQHOST: localhost
       MQUSER: merUser
       MQPASS: passwordMER
       MQPORT: 5672
       MNG_PORT: 15672
+      OUTPUT_FOLDER: /tmp/audios
 
     steps:
-    - name: Setup RabbitMQ Image
-      uses: mer-team/rabbitmq-mng-action@v1.2
-      with:
-        RABBITMQ_USER: $MQUSER
-        RABBITMQ_PASS: $MQPASS
-        RABBITMQ_PORT: $MQPORT
-        RABBITMQ_MNG_PORT: $MNG_PORT
-        RABBITMQ_TAG: '3-management-alpine'
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Checkout vidExtractor Project
-      uses: actions/checkout@v2
+      - name: Setup RabbitMQ Image
+        uses: mer-team/rabbitmq-mng-action@v1.2
+        with:
+          RABBITMQ_USER: ${{ env.MQUSER }}
+          RABBITMQ_PASS: ${{ env.MQPASS }}
+          RABBITMQ_PORT: ${{ env.MQPORT }}
+          RABBITMQ_MNG_PORT: ${{ env.MNG_PORT }}
+          RABBITMQ_TAG: '3-management-alpine'
 
-    - name: Build Local vidExtractor Docker Image
-      run: docker build -t vidextractor:latest .
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-    #- name: Container Image Scan
-    #  uses: azure/container-scan@v0
-    #  with:
-    #    image-name: vidextractor:latest
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run Local vidExtractor Docker Image
-      run: docker run -d -e TIME=10 -e HOST=$MQHOST -e USER=$MQUSER -e PASS=$MQPASS -e MNG_PORT=$MNG_PORT --net=host -v $GITHUB_WORKSPACE/:/vidExtractor/Audios vidextractor:latest
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: |
+            Dockerfile
+            .devcontainer/Dockerfile
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Create output directory
+        run: mkdir -p ${{ env.OUTPUT_FOLDER }}
 
-    - name: Install dependencies
-      run: npm install --also=dev
-      working-directory: src
-    #- name: Runnning build
-    #  run: npm run build --if-present
-    - name: Running tests
-      run: npm test
-      working-directory: src
-      env:
-        CI: true
+      - name: Run linting
+        run: npm run lint
 
-    - name: Dump docker logs on failure
-      if: failure()
-      uses: jwalton/gh-docker-logs@v1
+      - name: Check formatting
+        run: npm run prettier
+
+      - name: Run tests
+        run: npm test
+        env:
+          RABBITMQ_HOST: ${{ env.MQHOST }}
+          RABBITMQ_PORT: ${{ env.MQPORT }}
+          RABBITMQ_USER: ${{ env.MQUSER }}
+          RABBITMQ_PASS: ${{ env.MQPASS }}
+          OUTPUT_FOLDER: ${{ env.OUTPUT_FOLDER }}
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          tags: vidextractor:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v1

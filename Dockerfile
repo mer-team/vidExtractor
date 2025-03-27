@@ -1,23 +1,31 @@
-FROM node:14-alpine
+FROM node:22-alpine
 
-ARG HOST=localhost
-ARG USER=guest
-ARG PASS=guest
-ARG PORT=5672
-ARG MNG_PORT=15672
-ARG TIME=10
+# Set environment variables for production
+ENV NODE_ENV=production
 
-# install curl
-RUN apk --no-cache add curl
+# Install dependencies
+RUN apk --no-cache add curl=8.2.1-r1
 
-COPY ./src /vidExtractor
+# Set working directory and ensure it is owned by the node user
+WORKDIR /vid-extractor
 
-WORKDIR /vidExtractor
+# Copy package.json and package-lock.json first to leverage caching
+COPY ./package*.json ./
 
-RUN mkdir -p /vidExtractor/Audios
+# Install dependencies
+RUN npm install --omit=dev
 
-RUN npm install
+# Create folder for the audios and ensure it is owned by the node user
+RUN mkdir -p /audios && chown -R node:node /vid-extractor /audios
 
-RUN chmod +x ./wait-for-rabbit.sh
+# Set the default user to node for better security
+USER node
 
-ENTRYPOINT ["./wait-for-rabbit.sh", "node", "vidExtractorScript"]
+# Copy application source code
+COPY ./src /vid-extractor
+
+# Expose necessary ports (optional, based on your app's requirements)
+EXPOSE 3000
+
+# Start the application
+CMD ["node", "index.js"]
