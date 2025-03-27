@@ -338,6 +338,10 @@ We use **Husky** to enforce pre-commit checks. The following tasks are executed 
 - **hadolint**: Ensures the Dockerfiles that are present follow the rules too.
 - **Commitlint**: Validates commit messages against the project's commit message conventions.
 
+#### Bypassing Commit Hooks
+
+Currently, the project has pre-commit and pre-push hooks. Push hooks run the tests and, since ytdl-core node library is unstable, this might end up being too strict. You can bypass this by using --no-verify, for example `git push --no-verify`. If that fails just go to `husky/pre-push` and comment out the line with `#`.
+
 ### Commitlint Configuration
 
 Commitlint enforces a structured format for commit messages to maintain a clean and readable Git history. The format is as follows:
@@ -381,7 +385,6 @@ By following these conventions, we ensure a consistent and meaningful commit his
 ## Important Notes
 
 - RabbitMQ messages should be standardized
-- YTDL library fixed to 15.x, there's a bug in 16.x that currently gives 403
+- YTDL library is buggy, both 15.x and 16.x currently gives 403, consider going to yt-dlp or youtube-dl cli tools.
 - Debugger still to be configured
 - GitHub Actions need to be updated (and improved)
-- Also need to setup husky git hooks
